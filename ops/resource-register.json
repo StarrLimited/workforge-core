@@ -1,0 +1,48 @@
+{
+  "environment": "development",
+  "owner": "WorkForge Systems Limited (temporarily hosted in Starr Company Limited accounts)",
+  "supabase": {
+    "organization_id": "jhezzyvazfojokreihdn",
+    "project_id": "vtjwkyukmddvlsdejeyd",
+    "project_name": "WorkForge OS Development",
+    "region": "us-west-1",
+    "migration_versions": [
+      "20260910184931",
+      "20260910185833",
+      "20260910190231",
+      "20260911001214",
+      "20260911001704"
+    ],
+    "field_release_status": "Field 0.2 additive schema applied. Existing Juniper workspace remains on workflow version 1 for compatibility with the live 0.1 app. Activate version 2 using ops/activate-field-v2.sql only after the canonical /api/version reports 0.2.0."
+  },
+  "vercel": {
+    "team_slug": "shawn-7058",
+    "team_id": "team_gI5N0zdgKtgqHhSoX8vwRlnq",
+    "intended_project_name": "workforge-development",
+    "deployment_id": "dpl_4sxQy4LM7fE84L7cX5Fu9apmGf5c",
+    "deployment_url": "https://workforge-development-6wfqvp24d-shawn-7058.vercel.app",
+    "application_url": "https://workforge-development.vercel.app",
+    "inspector_url": "https://vercel.com/shawn-7058/workforge-development/4sxQy4LM7fE84L7cX5Fu9apmGf5c",
+    "requested_target": "preview",
+    "observed_target": "production",
+    "status": "Ready / Current confirmed in the user's Vercel screenshot on 2026-09-10. Canonical /login returned HTTP 200 and the WorkForge sign-in page without a provider authentication redirect. Provider read tools remain unable to locate the project.",
+    "deployed_application_version": "0.1.0",
+    "pending_application_version": "0.2.0",
+    "pending_release_status": "Blocked on 2026-09-11. Production and preview deployment requests both returned provider HTTP 403 permission errors for workforge-development. No 0.2 deployment was created."
+  },
+  "github": {
+    "repository": "StarrLimited/workforge-core",
+    "url": "https://github.com/StarrLimited/workforge-core",
+    "repository_id": "1364744286",
+    "visibility": "public",
+    "connection_status": "Personal-account installation added. README upload succeeded; the complete Field 0.2 source is published through the connected app.",
+    "initial_commit": "8efe4ac17860440661c3ff7ede12e95f5d3ba076"
+  },
+  "authentication": {
+    "status": "Owner workspace membership verified after sign-in; Google provider remains pending",
+    "site_url": "https://workforge-development.vercel.app",
+    "allowed_redirect_url": "https://workforge-development.vercel.app/auth/callback",
+    "configuration_url": "https://supabase.com/dashboard/project/vtjwkyukmddvlsdejeyd/auth/url-configuration"
+  },
+  "contains_secrets": false
+}
