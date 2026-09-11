@@ -4,7 +4,7 @@ Initial development foundation and Field demonstration for WorkForge Systems Lim
 
 ## Release status
 
-The 0.2 source builds and passes the automated and database checks. GitHub source publication is enabled. Deployment remains blocked by the Vercel connection returning permission errors and an empty project list. The hosted application remains 0.1. Follow [the release handoff](ops/release-0.2.md) to publish and activate the staged workflow. Signed-in browser verification remains pending.
+Field 0.2 is deployed at https://workforge-development.vercel.app through the connected GitHub repository. The Supabase environment configuration is in place; the canonical version endpoint and browser sign-in redirect passed verification. The existing demo workspace uses workflow version 2. Full signed-in workflow browser verification remains pending. See [the release notes](ops/release-0.2.md).
 
 ## Field expansion
 

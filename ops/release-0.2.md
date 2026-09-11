@@ -1,6 +1,6 @@
 # Field 0.2 release handoff
 
-Prepared September 11, 2026. This source release is built and tested but has not been deployed.
+Prepared September 11, 2026. The release is now deployed through Vercel Git integration. The user saved the public Supabase and app URL environment settings; the rebuilt application passed the canonical version and browser sign-in redirect checks. Juniper is activated on workflow version 2. Full signed-in workflow browser testing remains pending. The sections below retain the initial handoff history.
 
 ## Current state
 

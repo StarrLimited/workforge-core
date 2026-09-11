@@ -13,23 +13,24 @@
       "20260911001214",
       "20260911001704"
     ],
-    "field_release_status": "Field 0.2 additive schema applied. Existing Juniper workspace remains on workflow version 1 for compatibility with the live 0.1 app. Activate version 2 using ops/activate-field-v2.sql only after the canonical /api/version reports 0.2.0."
+    "field_release_status": "All five migrations applied. Juniper Field Services activated on workflow version 2 after canonical version and entry-page browser verification."
   },
   "vercel": {
     "team_slug": "shawn-7058",
     "team_id": "team_gI5N0zdgKtgqHhSoX8vwRlnq",
     "intended_project_name": "workforge-development",
-    "deployment_id": "dpl_xtzEF9tot2JTMS1ZYEGZnARo3AbX",
+    "deployment_id": "dpl_BR42ec2CZ53yuEZkFnSfVdZpEQkq",
     "application_url": "https://workforge-development.vercel.app",
-    "inspector_url": "https://vercel.com/shawn-7058/workforge-development/xtzEF9tot2JTMS1ZYEGZnARo3AbX",
+    "inspector_url": "https://vercel.com/shawn-7058/workforge-development/BR42ec2CZ53yuEZkFnSfVdZpEQkq",
     "requested_target": "preview",
     "observed_target": "production",
-    "status": "First Git deployment built successfully and canonical /api/version returned 0.2.0, but browser verification found missing Supabase environment settings.",
+    "status": "Git deployment completed. Canonical /api/version returned 0.2.0. Browser entry redirects to /login and renders the sign-in form after environment configuration.",
     "deployed_application_version": "0.2.0",
     "pending_application_version": "0.2.0",
-    "pending_release_status": "User reports saving the required public Supabase and app URL settings to Production and Preview. This checkpoint requests a new build; runtime validation and workflow activation are pending.",
+    "pending_release_status": "Release deployed; full signed-in workflow browser verification remains pending.",
     "project_id": "prj_AHk9cPGgzAEGxx3oqG9QvUIqwGqns",
-    "git_connection_status": "Confirmed connected by user screenshot and successful automatic build from GitHub."
+    "git_connection_status": "Confirmed connected by user screenshot and successful automatic build from GitHub.",
+    "verified_source_commit": "7e0fe86b92291eb77b9286fa434b701c681930eb"
   },
   "github": {
     "repository": "StarrLimited/workforge-core",
