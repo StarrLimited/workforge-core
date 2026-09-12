@@ -1,0 +1,59 @@
+/* WorkForge: the supplied orange/white mark, charcoal shell and clear work surfaces. */
+:root{--accent-soft:#fff1e6;--accent-line:#ffd1ae;--accent-hover:#eb6100;--charcoal:#171c20}
+.brand-lockup,.brand-plate{display:inline-flex;align-items:center;flex-shrink:0;max-width:100%}
+.brand-plate{background:#171c20;border-radius:8px;padding:10px 13px}
+.brand-logo{display:block;position:relative;overflow:hidden;width:202px;max-width:100%;aspect-ratio:1290/265;flex-shrink:1}
+.brand-logo img{position:absolute;width:119.0698%;height:auto;max-width:none;left:-12.0155%;top:-130.1887%;mix-blend-mode:screen}
+.sidebar-brand{padding:0 3px;min-height:44px;gap:8px}
+.sidebar-brand .brand-lockup{flex:1;min-width:0;flex-shrink:1}
+.sidebar-brand .brand-logo{width:202px}
+.sidebar{color:#d2d5d7;border-right:1px solid #2b3034}
+.sidebar nav button{color:#bcc2c6}
+.sidebar nav button:hover{background:#ffffff0b}
+.sidebar nav button.active{background:#ff6b0019;color:#fff}
+.sidebar nav button.active span{background:#ff6b0026;color:#ffb178}
+.workspace-switch{border-color:#ffffff20;background:#ffffff03}
+.workspace-switch>span,.workspace-switch small,.core-label small{color:#a2a9ae}
+.core-label{color:#d2d5d7}.core-label svg{color:var(--accent)}.logout{color:#b6bec3}
+.primary,.login-card button{background:var(--accent);color:#171c20;box-shadow:0 2px 3px #171c200d}
+.primary:hover,.login-card button:hover{background:var(--accent-hover)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline-color:#db5a00}
+input[type=checkbox]{accent-color:var(--brand-strong)}
+.metric:first-child,.model-card.current{border-top-color:var(--accent)}
+.count{background:var(--accent-soft);color:var(--brand-strong)}
+.chip,.service-tag,.module-tags span{background:#f0f1f1;color:#555f65}
+.avatar,.customer-initial,.partner-icon,.event-icon,.item-number{background:#eceeef;color:#515b61}
+.notice{background:#fff8f1;border-color:#f0decc;color:#74523b}
+.workflow-strip button.selected{border-color:var(--accent);background:var(--accent-soft)}
+.stage-track span.reached{background:var(--brand-strong)}
+.job-tabs button.active{color:var(--brand-strong);border-bottom-color:var(--accent);background:var(--accent-soft)}
+.customer-list>button:hover,.customer-list>button.selected{background:#fff5ed}
+.customer-list>button.selected{box-shadow:inset 3px 0 var(--accent)}
+.opportunity-card:hover{border-color:#f4b98c;box-shadow:0 4px 15px #171c200c}
+.opportunity-card h4{color:var(--ink)}
+.board-column{background:#eef0f0;border-color:var(--line)}
+.board-column>header{border-bottom-color:var(--line)}
+.quote-total-grid .price-summary,.estimate-summary .total{background:#fff5ec;border-color:#f2d8c3}
+.quote-total-grid .total{border-top-color:#ecc7aa}
+.revision-history>a,.proposal-actions a{color:var(--brand-strong)}
+.timeline-dot{background:var(--accent)}
+.modal{box-shadow:0 25px 100px #151a2033}.modal::backdrop,.nav-scrim{background:#10141799}
+.login-story{background:radial-gradient(ellipse at 95% 80%,#ff6b0010,transparent 50%),var(--charcoal)}
+.login-story .brand-logo{width:300px}
+.login-story>div>p:last-child{color:#b5bcc0}
+.login-story>small{color:#a0a8ad}
+.login-story:after{border-color:#ff6b0025}
+.login-panel{background:#fafaf9}
+.login-form>.chip{color:var(--brand-strong);background:var(--accent-soft)}
+.login-card .brand-plate{margin-bottom:24px}
+.loading .brand-plate{margin-bottom:22px}
+.loading .brand-logo{width:230px}
+.proposal header{border-bottom-color:var(--accent)}
+.proposal-brand{display:block;margin-top:0}
+.proposal-brand .brand-plate,.proposal-brand .brand-logo{display:inline-flex}
+.proposal-brand .brand-logo{width:160px}
+.proposal-brand>span:not(.brand-plate){color:var(--brand-strong);letter-spacing:1.5px;font-size:.62rem;margin-top:8px}
+@media(max-width:1200px){.sidebar-brand .brand-logo{width:183px}}
+@media(max-width:900px){.sidebar-brand .brand-lockup{max-width:178px}.sidebar-brand .brand-logo{width:178px}}
+@media(max-width:640px){.login-story{min-height:280px}.login-story .brand-logo{width:240px}.login-story h1{margin-top:24px}}
+@media print{.brand-plate{print-color-adjust:exact;-webkit-print-color-adjust:exact}.proposal header{border-bottom-color:#171c20}}
