@@ -29,7 +29,7 @@ npm ci
 npm run dev
 ```
 
-Set `NEXT_PUBLIC_APP_URL` to the deployment origin when an application has a fixed hostname. Otherwise callback redirects use the actual request origin. Enable `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` only after the dedicated Supabase project has a working Google OAuth provider.
+Email-link requests and authentication callbacks use the actual portal origin, never `NEXT_PUBLIC_APP_URL`. This keeps host-scoped session cookies on the correct portal and prevents a mistyped environment URL from breaking sign-in. Supabase's Site URL and redirect allow list must still match the intended deployment. Enable `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` only after the dedicated Supabase project has a working Google OAuth provider.
 
 ## Database and access bootstrap
 
