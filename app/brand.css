@@ -2,8 +2,8 @@
 :root{--accent-soft:#fff1e6;--accent-line:#ffd1ae;--accent-hover:#eb6100;--charcoal:#171c20}
 .brand-lockup,.brand-plate{display:inline-flex;align-items:center;flex-shrink:0;max-width:100%}
 .brand-plate{background:#171c20;border-radius:8px;padding:10px 13px}
-.brand-logo{display:block;position:relative;overflow:hidden;width:202px;max-width:100%;aspect-ratio:1290/265;flex-shrink:1}
-.brand-logo img{position:absolute;width:119.0698%;height:auto;max-width:none;left:-12.0155%;top:-130.1887%;mix-blend-mode:screen}
+.brand-logo{display:block;position:relative;overflow:hidden;width:202px;max-width:100%;aspect-ratio:1290/265;flex-shrink:1;border-radius:4px;background:#080b0c;isolation:isolate}
+.brand-logo img{position:absolute;width:119.0698%;height:auto;max-width:none;left:-12.0155%;top:-130.1887%}
 .sidebar-brand{padding:0 3px;min-height:44px;gap:8px}
 .sidebar-brand .brand-lockup{flex:1;min-width:0;flex-shrink:1}
 .sidebar-brand .brand-logo{width:202px}
