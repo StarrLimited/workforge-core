@@ -1,0 +1,48 @@
+-- Fictional fixtures are rolled back; existing vendor records are untouched.
+begin;
+create temporary table partner_results(check_name text,passed boolean);
+do $test$
+declare u uuid:=gen_random_uuid(); r uuid:=gen_random_uuid(); w uuid:=gen_random_uuid(); other_w uuid:=gen_random_uuid(); vendor uuid; crew uuid; sub uuid; other_vendor uuid; a uuid; b uuid; other_location uuid; blocked boolean; affected integer;
+begin
+ insert into auth.users(id,email,email_confirmed_at) values(u,'partner-qa-owner@example.com',now()),(r,'partner-qa-reader@example.com',now());
+ insert into public.workspaces(id,name,model,is_demo) values(w,'Partner QA','field',true),(other_w,'Other partner QA','field',true);
+ insert into public.workspace_memberships(workspace_id,user_id,role) values(w,u,'owner'),(w,r,'read_only');
+ insert into public.partners(workspace_id,name,kind) values(other_w,'Other tenant vendor','vendor') returning id into other_vendor;
+ insert into public.partner_locations(workspace_id,partner_id,name,address) values(other_w,other_vendor,'Private branch','Other tenant address') returning id into other_location;
+ perform set_config('request.jwt.claims',json_build_object('sub',u,'role','authenticated')::text,true);set local role authenticated;
+ insert into public.partners(workspace_id,name,kind) values(w,'QA vendor','vendor') returning id into vendor;
+ insert into public.partners(workspace_id,name,kind) values(w,'QA crew','crew') returning id into crew;
+ insert into public.partners(workspace_id,name,kind) values(w,'QA subcontractor','subcontractor') returning id into sub;
+ update public.partners set primary_region='Colorado Springs',coverage_area='Monument, Fountain and El Paso County' where id in (crew,sub);
+ if (select count(*) from public.partners where id in (crew,sub) and primary_region='Colorado Springs' and coverage_area='Monument, Fountain and El Paso County')<>2 then raise exception 'FAIL: crew/subcontractor coverage did not save';end if;
+ insert into public.partner_locations(workspace_id,partner_id,name,address,city,region,postal_code,contact_name,phone,notes) values(w,vendor,'Denver yard','123 Demo Road','Denver','CO','80201','QA contact','303-555-0100','Pickup at the west gate') returning id into a;
+ insert into public.partner_locations(workspace_id,partner_id,name,address,city,region) values(w,vendor,'Springs branch','456 Demo Road','Colorado Springs','CO') returning id into b;
+ if (select count(*) from public.partners p join public.partner_locations l on (l.workspace_id,l.partner_id)=(p.workspace_id,p.id) where p.id=vendor)<>2 then raise exception 'FAIL: multiple locations did not persist';end if;
+ update public.partner_locations set address='789 Updated Road',notes='Pickup at the east gate' where id=a;
+ if not exists(select 1 from public.partner_locations where id=a and address='789 Updated Road' and notes='Pickup at the east gate' and contact_name='QA contact') then raise exception 'FAIL: location edit';end if;
+ blocked:=false;begin insert into public.partner_locations(workspace_id,partner_id,name,address) values(w,crew,'Invalid crew branch','QA address');exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL: crew accepted as vendor location';end if;
+ blocked:=false;begin insert into public.partner_locations(workspace_id,partner_id,name,address) values(w,other_vendor,'Invalid tenant branch','QA address');exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL: cross-workspace parent accepted';end if;
+ blocked:=false;begin insert into public.partner_locations(workspace_id,partner_id,name,address) values(w,vendor,'Empty address','   ');exception when check_violation then blocked:=true;end;
+ if not blocked then raise exception 'FAIL: blank address accepted';end if;
+ if exists(select 1 from public.partner_locations where id=other_location) then raise exception 'FAIL: other workspace locations visible';end if;
+ update public.partner_locations set address='Tamper' where id=other_location;get diagnostics affected=row_count;
+ if affected<>0 then raise exception 'FAIL: cross-workspace edit';end if;
+ delete from public.partner_locations where id=b;
+ if exists(select 1 from public.partner_locations where id=b) or not exists(select 1 from public.partner_locations where id=a) or not exists(select 1 from public.partners where id=vendor) then raise exception 'FAIL: remove affected another location or vendor';end if;
+ reset role;insert into partner_results values('Multiple locations, addresses/contact details, edits and isolated removal',true),('Crew and subcontractor region/coverage persistence',true),('Vendor-only records, valid addresses and workspace isolation',true);
+ perform set_config('request.jwt.claims',json_build_object('sub',r,'role','authenticated')::text,true);set local role authenticated;
+ if not exists(select 1 from public.partner_locations where id=a) then raise exception 'FAIL: authorized reader cannot see locations';end if;
+ blocked:=false;begin insert into public.partner_locations(workspace_id,partner_id,name,address) values(w,vendor,'Reader write','QA address');exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL: reader inserted location';end if;
+ update public.partner_locations set name='Reader edit' where id=a;get diagnostics affected=row_count;
+ if affected<>0 then raise exception 'FAIL: reader edited location';end if;
+ delete from public.partner_locations where id=a;get diagnostics affected=row_count;
+ if affected<>0 then raise exception 'FAIL: reader removed location';end if;
+ update public.partners set primary_region='Reader edit' where id=crew;get diagnostics affected=row_count;
+ if affected<>0 then raise exception 'FAIL: reader edited coverage';end if;
+ reset role;insert into partner_results values('Read-only access permits viewing and blocks creation, editing and removal',true);
+end $test$;
+select * from partner_results;
+rollback;

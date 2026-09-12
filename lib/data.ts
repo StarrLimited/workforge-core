@@ -27,7 +27,10 @@ export async function loadWorkspace(workspaceId:string):Promise<DataSet> {
   const tables = ['contacts','partners','work_orders','estimate_versions','tasks','appointments','purchase_orders','audit_events','file_records','pricebook_items','field_profiles','financial_records'] as const;
   const [workspace,...results] = await Promise.all([
     db.from('workspaces').select('*').eq('id',workspaceId).single(),
-    ...tables.map(table => db.from(table).select('*').eq('workspace_id',workspaceId).order(table === 'audit_events' ? 'created_at' : table==='field_profiles'?'work_order_id':'id',{ascending:table!=='audit_events'}).limit(table==='audit_events'?100:1000))
+    ...tables.map(table => {
+      const query=table==='partners'?db.from('partners').select('*, locations:partner_locations(*)'):db.from(table).select('*');
+      return query.eq('workspace_id',workspaceId).order(table === 'audit_events' ? 'created_at' : table==='field_profiles'?'work_order_id':'id',{ascending:table!=='audit_events'}).limit(table==='audit_events'?100:1000);
+    })
   ]);
   if (workspace.error || results.some(x=>x.error)) throw new Error('Some workspace records could not be loaded. Please retry.');
   return {workspace:workspace.data as Workspace,role,contacts:results[0].data,partners:results[1].data,orders:results[2].data,estimates:results[3].data,tasks:results[4].data,appointments:results[5].data,purchases:results[6].data,activity:results[7].data,files:results[8].data,pricebook:results[9].data,profiles:results[10].data,financials:results[11].data} as DataSet;
