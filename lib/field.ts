@@ -48,3 +48,15 @@ export function jobFinancials(data:DataSet,order:WorkOrder){
 }
 
 export function lineAmount(quantity:number,unitCents:number){if(!Number.isFinite(quantity)||!Number.isFinite(unitCents)||quantity<0||quantity>100000||unitCents<0||unitCents>1000000000)return 0;return Number(round(BigInt(Math.round(quantity*1000))*BigInt(Math.round(unitCents)),1000n));}
+
+export function closeoutChecks(data:DataSet, order:WorkOrder) {
+  const profile=profileFor(data,order), finances=jobFinancials(data,order);
+  return [
+    {label:'Work completed and invoice handoff prepared',done:order.stage==='invoice_ready',tab:'production' as const},
+    {label:'Customer walkthrough completed',done:profile.walkthrough_complete,tab:'production' as const},
+    {label:'Job tasks and punch list completed',done:data.tasks.filter(t=>t.work_order_id===order.id).every(t=>t.completed),tab:'production' as const},
+    {label:'Purchases received and production assignments completed',done:data.purchases.filter(p=>p.work_order_id===order.id).every(p=>p.status==='received'),tab:'production' as const},
+    {label:'Job costs reviewed',done:profile.costs_reviewed,tab:'production' as const},
+    {label:'Customer payments recorded and balance settled',done:!!finances.estimate&&finances.balance===0,tab:'financials' as const},
+  ];
+}

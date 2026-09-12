@@ -14,13 +14,15 @@ export async function mutate(workspaceId:string,action:string,form:FormData):Pro
     if(!canWrite(role))throw new Error('This workspace is read only for your account.');
     const orderId=field(form,'work_order_id',100);
     let id:string|undefined;
-    if(action==='customer_job') {
+    if(action==='demo_copy') {
+      const {data,error}=await db.rpc('copy_demo_field_job',{p_workspace_id:workspaceId,p_order_id:orderId});if(error)throw new Error(error.message);id=String(data);
+    } else if(action==='customer_job') {
       const {data,error}=await db.rpc('create_customer_job',{p_workspace_id:workspaceId,p_contact_id:required(form,'contact_id',100),p_title:required(form,'title',200),p_scope:field(form,'description',5000)});if(error)throw new Error(error.message);id=String(data);
     } else if(action==='field_estimate') {
       const lines=JSON.parse(required(form,'lines',200000)) as EstimateLine[];
       const discount=Number(required(form,'discount_percent')),tax=Number(required(form,'tax_rate')),deposit=Number(required(form,'deposit_percent')),margin=Number(required(form,'target_margin'));
       quoteTotals(lines,discount,tax,deposit);
-      const {error}=await db.rpc('save_field_estimate',{p_workspace_id:workspaceId,p_order_id:orderId,p_expected:required(form,'expected_updated_at'),p_lines:lines,p_scope:field(form,'description',10000),p_margin:margin,p_discount:discount,p_tax:tax,p_deposit:deposit,p_terms:field(form,'terms',10000),p_valid_until:field(form,'valid_until')||null});if(error)throw new Error(error.message);
+      const {error}=await db.rpc('save_and_prepare_field_estimate',{p_workspace_id:workspaceId,p_order_id:orderId,p_expected:required(form,'expected_updated_at'),p_lines:lines,p_scope:field(form,'description',10000),p_margin:margin,p_discount:discount,p_tax:tax,p_deposit:deposit,p_terms:field(form,'terms',10000),p_valid_until:field(form,'valid_until')||null});if(error)throw new Error(error.message);
     } else if(['qualification','consultation','operations'].includes(action)) {
       const values:Record<string,string|boolean|null>={};
       const keys=action==='qualification'?['service','source','sales_owner','priority','follow_up_on','sales_status','lost_reason','job_address']:action==='consultation'?['goals','measurements','access_notes','site_conditions','consultation_complete']:['operations_owner','materials_status','walkthrough_complete','costs_reviewed','operations_notes'];
