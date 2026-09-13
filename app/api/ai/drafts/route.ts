@@ -3,7 +3,8 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { canWrite } from '@/lib/core';
 import { AI_KINDS,type AISnapshot } from '@/lib/ai/contracts';
-import { aiErrorMessage,buildPrompt,generateFieldDraft } from '@/lib/ai/generate';
+import { AI_MODEL,buildPrompt,generateFieldDraft } from '@/lib/ai/generate';
+import { aiFailure,type AICredential } from '@/lib/ai/errors';
 export const runtime='nodejs';
 export const maxDuration=90;
 export const dynamic='force-dynamic';
@@ -35,17 +36,25 @@ export async function POST(req:NextRequest){
  const {data:reservation,error:startError}=await auth.db.rpc('reserve_field_ai',{p_workspace_id:input.workspace_id,p_order_id:input.work_order_id,p_kind:input.kind});
  if(startError)return NextResponse.json({error:startError.message},{status:409});
  const run=reservation as {id:string;execution_token:string;snapshot:AISnapshot};
+ const credential:AICredential=process.env.AI_GATEWAY_API_KEY?'api-key':process.env.VERCEL_OIDC_TOKEN||process.env.VERCEL==='1'?'vercel-identity':'none';
+ const started=Date.now();
+ console.info('workforge.ai.started',{draftId:run.id,kind:input.kind,model:AI_MODEL,credential});
  let result=null,raw:string|null=null,inputTokens:number|null=null,outputTokens:number|null=null,errorMessage:string|null=null;
  try {
   buildPrompt(input.kind,run.snapshot);
   const generated=await generateFieldDraft(input.kind,run.snapshot);result=generated.result;raw=generated.text;
   inputTokens=generated.usage.inputTokens??null;outputTokens=generated.usage.outputTokens??null;
  }catch(error){
-  errorMessage=aiErrorMessage(error);
+  const failure=aiFailure(error,credential);errorMessage=failure.message;
+  console.error('workforge.ai.failed',{draftId:run.id,model:AI_MODEL,code:failure.code,status:failure.status,credential,durationMs:Date.now()-started});
   const failed=error as {text?:string;usage?:{inputTokens?:number;outputTokens?:number}};
   raw=typeof failed?.text==='string'?failed.text:null;inputTokens=failed?.usage?.inputTokens??null;outputTokens=failed?.usage?.outputTokens??null;
  }
  const {error:saveError}=await auth.db.rpc('finish_field_ai',{p_id:run.id,p_token:run.execution_token,p_result:result,p_raw:raw?.slice(0,24000)??null,p_input:inputTokens,p_output:outputTokens,p_error:errorMessage});
- if(saveError)return NextResponse.json({id:run.id,error:'The AI response could not be saved. No job changes were made. Check saved drafts before generating another.'},{status:503});
+ if(saveError){
+  console.error('workforge.ai.save_failed',{draftId:run.id,durationMs:Date.now()-started});
+  return NextResponse.json({id:run.id,error:'The AI response could not be saved. No job changes were made. Check saved drafts before generating another.'},{status:503});
+ }
+ console.info('workforge.ai.saved',{draftId:run.id,status:errorMessage?'failed':'ready',inputTokens,outputTokens,durationMs:Date.now()-started});
  return NextResponse.json({id:run.id,...(errorMessage?{error:errorMessage}:{ok:true})},{status:errorMessage?502:200});
 }

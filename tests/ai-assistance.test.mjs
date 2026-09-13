@@ -39,7 +39,7 @@ test('Unknown, duplicate and cross-workspace pricebook IDs cannot price a draft'
  assert.throws(()=>validateDraft('estimate',{...draft,items:[...draft.items,...draft.items]},snapshot),/unavailable/);
 });
 test('Provider failures give useful instructions without leaking provider messages or secrets',()=>{
- assert.match(aiErrorMessage({statusCode:402,message:'secret'}),/AI connection needs setup/);
+ assert.match(aiErrorMessage({statusCode:402,message:'secret'}),/billing or credit restriction/);
  assert.match(aiErrorMessage({name:'AbortError',message:'secret'}),/timed out/);
  assert.ok(!aiErrorMessage(new Error('sk-private-secret')).includes('sk-private'));
 });
