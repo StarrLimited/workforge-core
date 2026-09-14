@@ -1,0 +1,6 @@
+project_id = "workforge-core"
+
+[functions.hq-webflow-intake]
+# Custom 256-bit integration key; the RPC verifies its hash before any write.
+verify_jwt = false
+entrypoint = "./functions/hq-webflow-intake/index.ts"

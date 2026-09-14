@@ -1,4 +1,4 @@
-# WorkForge HQ — initial implementation
+# WorkForge HQ
 
 WorkForge HQ manages the internal WorkForge business at `/hq`, using the existing
 application and Supabase project. It is separate from Field customer workspaces.
@@ -33,15 +33,15 @@ The migration provisions Shawn's existing confirmed account as owner. It records
 a member invitation for the previously authorized `neil@starrlimited.com` address;
 the existing sign-in invitation claim process accepts it. It sends no email.
 
-The migration has not been applied to the shared database during development.
-This prevents HQ from appearing in the existing workspace menu before its route
-is deployed. The customer product's default route and data remain compatible.
+HQ was deployed through PR #1 and its database migration applied on September 14,
+2026. The existing owner membership and empty HQ workspace were verified after
+activation. The live portal is https://workforge-development.vercel.app/hq.
 
 ## Verification
 
 - Production build succeeded on Next.js 16.3.4.
 - TypeScript passed.
-- All 31 Node tests passed, including three HQ commercial/dashboard tests.
+- All 34 Node tests passed, including HQ commercial/dashboard and intake tests.
 - The exact HQ migration and `tests/hq-integration.sql` passed in an isolated
   PGlite 0.5.8 PostgreSQL engine. Production membership policy and audit function
   definitions were reused in the test bootstrap.
@@ -67,18 +67,44 @@ forms across those domains and deduplicate by submission ID.
 | Phone | phone |
 | Workflow Notes | initial requirements / scope |
 | Lead Source | normalized source |
-| UTM Source / Medium / Campaign / Content / Term | attribution to preserve when intake is added |
-| Landing Page / Landing Variant | attribution to preserve when intake is added |
+| UTM Source / Medium / Campaign / Content / Term | receipt attribution and visible account notes |
+| Landing Page / Landing Variant | receipt attribution and visible account notes |
+| Business Type / Main Challenge / Team Size | receipt attribution and visible account notes |
 
-Automatic intake is not yet connected. Manual inquiry entry works in this release.
-Before enabling Webflow delivery, add a verified webhook or authenticated API sync,
-durable submission ID deduplication, the attribution fields, and an observed
-submission-to-HQ acceptance test. Preserve Webflow's existing submissions and
-Google Ads conversion behavior.
+The `hq-webflow-intake` Edge Function accepts the twelve observed consultation
+form IDs across all three domains. Cookie consent and unrelated forms are ignored.
+New leads are assigned to Shawn with a same-day follow-up in America/Denver.
+Product remains undecided until discovery. Existing accounts are never overwritten.
+Submission ID deduplication and account creation occur in one database transaction.
+Transient failures return a non-200 response so Webflow can retry. Repeated
+submissions with distinct Webflow IDs remain separate inquiries for staff review.
+
+The webhook uses a dedicated random 256-bit key in its destination URL. Treat
+that full URL as a credential; never commit it or include it in routine output.
+Only its SHA-256 hash is stored in `private.hq_webhook_keys`. The Edge Function
+uses its built-in server credential to call a service-role-only RPC, which verifies
+the integration key before writes. Anonymous users and staff browser sessions
+cannot call this RPC or read the key table. No service key is sent to Webflow.
+This is custom integration-key authentication, not Webflow HMAC verification.
+
+To activate: apply `20260914053812_workforge_hq_intake.sql`, provision a fresh
+random key hash under the `webflow` name, deploy the function with its custom-auth
+configuration, and create one `form_submission` webhook on the existing site.
+Keep the raw key only in the Webflow webhook destination. To disable, set
+`private.hq_webhook_keys.enabled=false`; to rotate, replace the hash and webhook URL.
+The endpoint limits incoming bodies to 64 KiB and does not log request bodies,
+secret URLs, credentials, or database error details.
+
+Webflow remains the source record for submissions. Its existing form actions and
+Google Ads conversion behavior are preserved. Recovery can replay the original
+submission ID through the authenticated handler; duplicates are safe. Monitor
+the Webflow webhook's last-triggered status, Supabase function failures, and
+`hq_intake_receipts` for delivery. Existing website submissions were inspected
+and consist of prior setup/test inquiries; they are not imported as real leads.
 
 ## Remaining connections
 
-- Automatic Webflow intake and its end-to-end verification.
+- Observe a live website-to-HQ submission after activating the webhook.
 - SCL Executive summary feed.
 - Accounting, invoice generation, payment charging, Google Calendar sync, and
   AI/hosting cost attribution are not connected in this initial release.

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const root=fileURLToPath(new URL('../', import.meta.url));
 const db=new PGlite();
-await db.exec(`create role anon; create role authenticated; create schema auth; create schema private;
+await db.exec(`create role anon; create role authenticated; create role service_role bypassrls; create schema auth; create schema private;
 create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz);
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
 grant usage on schema auth,private to authenticated;
@@ -27,4 +27,7 @@ await db.exec('grant execute on function private.can_read(uuid),private.can_writ
 await db.exec(readFileSync(root+'/supabase/migrations/20260914043443_workforge_hq.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-integration.sql','utf8'));
 console.log('PASS: HQ migration, owner writes, idempotent handoff, six tasks, launch gate, frozen scope, read-only role, outsider isolation, RLS, anonymous RPC revocation. Fixtures rolled back.');
+await db.exec(readFileSync(root+'/supabase/migrations/20260914053812_workforge_hq_intake.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-intake-integration.sql','utf8'));
+console.log('PASS: Webflow authentication, submission deduplication, atomic rollback, field mapping, client RPC and key isolation. Fixtures rolled back.');
 await db.close();
