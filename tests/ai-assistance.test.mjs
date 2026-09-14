@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MockLanguageModelV4 } from 'ai/test';
-import { buildPrompt,generateFieldDraft,aiErrorMessage } from '../lib/ai/generate.ts';
+import { createGateway } from 'ai';
+import { AI_MODEL,buildPrompt,generateFieldDraft,aiErrorMessage } from '../lib/ai/generate.ts';
 import { estimatePreview,validateDraft,reviewSchema } from '../lib/ai/contracts.ts';
 const workspace='5c409bda-c01d-4691-aa3e-9b96e1467981';
 const product='7e281ed4-fb6e-4c83-b49d-c0f3905a5f9e';
@@ -11,6 +12,29 @@ const mock=(text)=>new MockLanguageModelV4({doGenerate:async()=>({content:[{type
 test('AI structured generation returns validated output and measured usage',async()=>{
  const result=await generateFieldDraft('estimate',snapshot,mock(JSON.stringify(draft)));
  assert.deepEqual(result.result,draft);assert.equal(result.usage.inputTokens,100);assert.equal(result.usage.outputTokens,50);
+});
+test('All three assistants send bounded structured requests to Luna through the Gateway SDK',async()=>{
+ const requests=[];
+ const answer={...draft,notes:'Confirm the delivery before starting.',tasks:['Check access']};
+ const provider=createGateway({apiKey:'fictional-test-key',fetch:async(_url,options)=>{
+  const body=JSON.parse(options.body);
+  requests.push({model:new Headers(options.headers).get('ai-language-model-id'),body});
+  return Response.json({content:[{type:'text',text:JSON.stringify(answer)}],finishReason:{unified:'stop'},usage:{inputTokens:{total:3000,noCache:3000},outputTokens:{total:1000,text:800,reasoning:200}},warnings:[]});
+ }});
+ for(const kind of ['consultation','estimate','handoff']){
+  const generated=await generateFieldDraft(kind,snapshot,provider(AI_MODEL));
+  assert.deepEqual(generated.result,answer);
+  assert.equal(generated.usage.outputTokens,1000,'Cost tracking includes reasoning tokens');
+ }
+ assert.equal(requests.length,3,'One provider request per assistant');
+ for(const {model,body} of requests){
+  assert.equal(model,'openai/gpt-5.6-luna');
+  assert.equal(body.maxOutputTokens,4000);
+  assert.equal(body.reasoning,'low');
+  assert.equal(body.responseFormat.type,'json');
+  assert.ok(body.responseFormat.schema);
+  assert.equal(body.providerOptions?.gateway?.models,undefined,'No premium model fallback');
+ }
 });
 test('Invalid model output never becomes a usable draft; usage remains available',async()=>{
  await assert.rejects(generateFieldDraft('estimate',snapshot,mock('not valid json')));

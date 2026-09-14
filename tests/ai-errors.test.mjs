@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGateway } from 'ai';
-import { generateFieldDraft } from '../lib/ai/generate.ts';
+import { AI_MODEL,generateFieldDraft } from '../lib/ai/generate.ts';
 import { aiFailure } from '../lib/ai/errors.ts';
 
 const snapshot = {order:{title:'Fictional consultation',description:'Mulch refresh'},profile:{goals:'Refresh mulch'},pricebook:[],approved_estimate:null,tasks:[]};
@@ -22,7 +22,7 @@ test('Real Gateway SDK errors retain distinct auth, credit, plan and access diag
    calls++;
    return new Response(JSON.stringify({error:{type:item.type,message:`${item.message}. PRIVATE CUSTOMER DETAILS fictional-secret-key`}}),{status:item.status,headers:{'content-type':'application/json'}});
   }});
-  await assert.rejects(generateFieldDraft('consultation',snapshot,provider('openai/gpt-6-astra')),error => {
+  await assert.rejects(generateFieldDraft('consultation',snapshot,provider(AI_MODEL)),error => {
    const failure = aiFailure(error,'api-key');
    assert.equal(failure.code,item.code);
    assert.equal(failure.status,item.status);

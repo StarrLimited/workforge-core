@@ -33,14 +33,15 @@ export async function POST(req:NextRequest){
  const input=parsed.data;const auth=await authorize(input.workspace_id);if(auth.error)return auth.error;
  if(!canWrite(auth.role))return NextResponse.json({error:'This workspace is read only for your account.'},{status:403});
  if(!process.env.AI_GATEWAY_API_KEY&&!process.env.VERCEL_OIDC_TOKEN&&process.env.VERCEL!=='1')return NextResponse.json({error:'AI connection needs setup. Add an AI Gateway API key to the server environment, or use the Vercel deployment’s AI Gateway connection.'},{status:503});
- const {data:reservation,error:startError}=await auth.db.rpc('reserve_field_ai',{p_workspace_id:input.workspace_id,p_order_id:input.work_order_id,p_kind:input.kind});
+ const {data:reservation,error:startError}=await auth.db.rpc('reserve_field_ai',{p_workspace_id:input.workspace_id,p_order_id:input.work_order_id,p_kind:input.kind,p_model:AI_MODEL});
  if(startError)return NextResponse.json({error:startError.message},{status:409});
- const run=reservation as {id:string;execution_token:string;snapshot:AISnapshot};
+ const run=reservation as {id:string;execution_token:string;model:string;snapshot:AISnapshot};
  const credential:AICredential=process.env.AI_GATEWAY_API_KEY?'api-key':process.env.VERCEL_OIDC_TOKEN||process.env.VERCEL==='1'?'vercel-identity':'none';
  const started=Date.now();
  console.info('workforge.ai.started',{draftId:run.id,kind:input.kind,model:AI_MODEL,credential});
  let result=null,raw:string|null=null,inputTokens:number|null=null,outputTokens:number|null=null,errorMessage:string|null=null;
  try {
+  if(run.model!==AI_MODEL)throw new Error('AI model reservation mismatch.');
   buildPrompt(input.kind,run.snapshot);
   const generated=await generateFieldDraft(input.kind,run.snapshot);result=generated.result;raw=generated.text;
   inputTokens=generated.usage.inputTokens??null;outputTokens=generated.usage.outputTokens??null;
