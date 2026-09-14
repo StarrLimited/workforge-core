@@ -79,3 +79,30 @@ MRR movement reporting is not implemented.
   delivery, launch gates, read-only roles, outsider isolation and secret protection.
 - Fixtures use `.invalid` addresses; database test transactions roll back.
 - Provider setup and live signed-in verification are tracked in the release follow-up.
+
+
+## Production verification — September 14, 2026
+
+- Released through [PR #6](https://github.com/StarrLimited/workforge-core/pull/6),
+  production commit `edc82eb617166f99fcd667b63e4bfa5b112c6b13`. Vercel reported success.
+- Live PostgreSQL lifecycle test passed in a rolled-back transaction. Security
+  advisors reported no new findings attributable to this change.
+- Real HTTP requests to the deployed Google receiver returned 200 for a synthetic
+  lead, repeated delivery and flagged provider test; an invalid key returned 401.
+  Database verified one customer, one delivery receipt and no customer for the
+  flagged test. This used temporary QA configuration, not the actual Ads account.
+- Signed-in browser verification followed that incoming lead through saved scope,
+  agreed fee, Won, six completed implementation tasks, support handoff and Live.
+  Launch assigned the account/check-in to Neil with the agreed review date.
+- Browser-created customer support ticket saved, blocked closure without resolution,
+  and saved a resolved state with resolution timestamp.
+- Browser-created active $299/month subscription displayed $299 software MRR.
+- Field OS demo opened successfully and workspace selection returned to HQ.
+- Screens were visually inspected; no application console errors were observed.
+- All synthetic customer, project, fee, task, support, subscription and lead receipt
+  records were removed. Temporary integration credentials were deleted and both
+  new provider connections were left disabled. Audit history records the verification.
+- Website intake remains enabled. Meta is not connected in the available advertising
+  connector; the Google connector does not provide native lead-webhook configuration.
+  Actual Meta Page/form credentials and Google native form delivery settings still
+  require provider setup and a real provider test in HQ → Lead connections.
