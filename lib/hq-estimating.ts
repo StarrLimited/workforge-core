@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { packageLineErrors } from './hq-catalog';
 import { CATEGORIES, CADENCES, DOC_FIELDS, DISCOVERY, lineAmount, type Proposal, type Opportunity, type Requirement } from './hq-sales';
 
 export const DISCOVERY_STARTERS: Record<string,string> = {
@@ -21,7 +22,7 @@ export type MailDelivery={id:string;proposal_id:string;recipient_email:string;st
 export const SIGNING_CONSENT='I have read this agreement and approve its scope, prices, payment schedule, and terms. I am authorized to sign for the party named above. I agree to use my typed name and, if supplied, drawn signature as my electronic signature for this exact revision.';
 export const signatureSchema=z.object({name:z.string().trim().min(2).max(200),title:z.string().trim().min(1).max(200),email:z.email().max(254),signature_image:z.string().max(200000).refine(v=>v===''||/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(v),'Use the signature area to draw your signature.'),consent:z.literal(true)});
 export function proposalReadiness(p:Proposal,o:Opportunity,requirements:Requirement[],day:string):string[]{
- const missing:string[]=[];
+ const missing:string[]=packageLineErrors(p.lines);
  if(p.valid_until<day)missing.push('Choose a future expiry date.');
  for(const [key,label] of DOC_FIELDS)if(!p.document[key]?.trim()||p.document[key].includes('[Complete'))missing.push('Complete '+label.toLowerCase()+'.');
  if(!p.terms_reviewed)missing.push('Review and confirm the agreement terms.');
