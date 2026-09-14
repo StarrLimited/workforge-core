@@ -6,3 +6,5 @@
 @media(prefers-reduced-motion:reduce){.hq-shell *{scroll-behavior:auto!important;transition:none!important}}
 
 .hq-connection-url{display:flex;flex-direction:column;gap:8px;margin:20px 0;font-size:.875rem}.hq-connection-url input{font-size:.875rem;min-width:0;width:100%}.hq-connection-form{padding:24px 0 0}.hq-panel>header select{max-width:180px}.hq-sidebar nav{flex-shrink:0}.hq-sidebar-bottom{flex-shrink:0}
+
+.hq-sales-entry{display:flex;align-items:center;gap:10px;padding:13px 12px;color:#c7cfd4;text-decoration:none;font-size:.875rem;border-radius:7px}.hq-sales-entry:hover{background:#ffffff0c}

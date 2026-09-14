@@ -51,7 +51,7 @@ export function HQRecordForm({ form, data, busy, error, onSubmit, onClose }: {
         {form.kind === 'stage' && <><input type="hidden" name="expected_stage" value={form.record.stage}/>
           <label>Sales stage<select name="stage" defaultValue={form.record.stage}>{HQ_STAGES.map(s => <option key={s} value={s}>{HQ_STAGE_LABELS[s]}</option>)}</select></label>
           <label>Reason if lost<textarea name="lost_reason" rows={3} maxLength={1000} defaultValue={form.record.lost_reason}/></label>
-          <p className="hq-hint">Before marking won, record the agreed scope and at least one agreed fee. This creates the implementation and six onboarding tasks.</p>
+          <p className="hq-hint">Use Sales & delivery to prepare and accept an agreement. Acceptance creates the scoped project and checklist; a manually entered fee does not authorize a build.</p>
         </>}
         {form.kind === 'implementation' && <><div className="hq-form-grid"><label>Status<select name="status" defaultValue={form.record.status}>{HQ_DELIVERY.map(s => <option key={s} value={s}>{HQ_DELIVERY_LABELS[s]}</option>)}</select></label><Owner value={form.record.owner}/></div>
           <label>Target launch date<input name="target_on" type="date" defaultValue={form.record.target_on ?? ''}/></label><label>Blocker / information needed<textarea name="blocker" rows={3} maxLength={3000} defaultValue={form.record.blocker}/></label>
@@ -64,11 +64,11 @@ export function HQRecordForm({ form, data, busy, error, onSubmit, onClose }: {
         {form.kind === 'engagement' && <><AccountPicker data={data} required value={form.record?.account_id ?? form.accountId}/>
           <label>Service<select name="service" defaultValue={form.record?.service ?? 'implementation'}>{HQ_SERVICES.map(s => <option key={s} value={s}>{HQ_SERVICE_LABELS[s]}</option>)}</select></label>
           <label>Description<input name="description" required maxLength={500} defaultValue={form.record?.description}/></label>
-          <div className="hq-form-grid"><label>Billing basis<select name="cadence" defaultValue={form.record?.cadence ?? 'one_time'}><option value="one_time">One-time fee</option><option value="monthly">Monthly fee</option></select></label>
+          <div className="hq-form-grid"><label>Billing basis<select name="cadence" defaultValue={form.record?.cadence ?? 'one_time'}><option value="one_time">One-time fee</option><option value="monthly">Monthly fee</option><option value="annual">Annual fee</option></select></label>
             <label>Status<select name="status" defaultValue={form.record?.status ?? 'proposed'}><option value="proposed">Proposed</option><option value="agreed">Agreed</option><option value="ended">Ended / cancelled</option></select></label>
             <label>Fee ($)<input name="amount" type="number" step="0.01" min="0.01" required defaultValue={form.record ? form.record.amount_cents / 100 : ''}/></label>
             <label>Paid toward one-time fee ($)<input name="paid" type="number" step="0.01" min="0" required defaultValue={form.record ? form.record.paid_cents / 100 : 0}/></label></div>
-          <p className="hq-hint">Enter 0 paid for monthly fees. These records track commitments and manually recorded payments; they do not send invoices or charge customers.</p></>}
+          <p className="hq-hint">Enter 0 paid for recurring fees. These records track commitments and manually recorded payments; they do not send invoices or charge customers.</p></>}
         {form.kind === 'event' && <><label>Event title<input name="title" required maxLength={200} defaultValue={form.record?.title}/></label>
           <div className="hq-form-grid"><AccountPicker data={data} value={form.record?.account_id ?? form.accountId}/><Owner value={form.record?.owner}/>
             <label>Starts<input type="datetime-local" name="starts_at" required defaultValue={localDateTime(form.record?.starts_at)}/></label><label>Ends<input type="datetime-local" name="ends_at" required defaultValue={localDateTime(form.record?.ends_at)}/></label></div>
