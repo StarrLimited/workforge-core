@@ -1,8 +1,8 @@
 # WorkForge HQ: discovery, agreements, and delivery
 
-Status: review draft, September 14, 2026. These documents are prepared; the HQ application changes described here are not implemented or deployed.
+Status: first implementation prepared September 14, 2026. The design below describes the overall model; see [release notes](release.md) for the implemented scope and verification status.
 
-The current coding environment is unavailable. The existing repository was inspected through GitHub at main commit 35ffad722e0aef6807ee45ae07e751c55bfb849c. Application implementation, database migrations, automated tests, and browser verification remain outstanding.
+The first release adds `/hq/sales` with discovery, printable estimate/agreement revisions, acceptance references, project checklists, beta runs, defects and launch gates. Existing customer, subscription and support records remain linked. Direct electronic signing, signed-file uploads and automatic billing are outside this release.
 
 ## The customer journey
 

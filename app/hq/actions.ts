@@ -45,11 +45,11 @@ export async function mutateHQ(action: string, form: FormData): Promise<{ ok: bo
     } else if (action === 'toggle_task') {
       result = await update('hq_tasks', { completed: z.enum(['true', 'false']).parse(raw.completed) === 'true' });
     } else if (action === 'engagement') {
-      const values = z.object({ account_id: uuid, service: z.enum(HQ_SERVICES), description: required(500), cadence: z.enum(['one_time', 'monthly']),
+      const values = z.object({ account_id: uuid, service: z.enum(HQ_SERVICES), description: required(500), cadence: z.enum(['one_time', 'monthly', 'annual']),
         amount: required(30), paid: required(30), status: z.enum(['proposed', 'agreed', 'ended']) }).parse(raw);
       const amount_cents = moneyToCents(values.amount); const paid_cents = moneyToCents(values.paid);
       if (amount_cents <= 0) throw new Error('The fee must be greater than zero.');
-      if (values.cadence === 'monthly' && paid_cents !== 0) throw new Error('Payment tracking currently supports one-time fees.');
+      if (values.cadence !== 'one_time' && paid_cents !== 0) throw new Error('Payment tracking currently supports one-time fees.');
       if (values.cadence === 'one_time' && paid_cents > amount_cents) throw new Error('Recorded payments cannot exceed the fee.');
       const record = { account_id: values.account_id, service: values.service, description: values.description, cadence: values.cadence, amount_cents, paid_cents, status: values.status };
       result = raw.id ? await update('hq_engagements', record) : await db.from('hq_engagements').insert({ ...record, workspace_id: HQ_WORKSPACE_ID }).select('id').single();

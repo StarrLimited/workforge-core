@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const root=fileURLToPath(new URL('../', import.meta.url));
 const db=new PGlite();
+try {
 await db.exec(`create role anon; create role authenticated; create role service_role bypassrls; create schema auth; create schema private;
 create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz);
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
@@ -33,4 +34,10 @@ console.log('PASS: Webflow authentication, submission deduplication, atomic roll
 await db.exec(readFileSync(root+'/supabase/migrations/20260914160624_hq_leads_support.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-lifecycle-integration.sql','utf8'));
 console.log('PASS: Google and Meta intake, test isolation, duplicate delivery, failed receipt recovery, sales handoff, support launch gate, subscription and ticket lifecycle, read-only/outsider isolation and secret protection. Fixtures rolled back.');
-await db.close();
+await db.exec(readFileSync(root+'/supabase/migrations/20260914201937_hq_sales_delivery.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-intake-integration.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-sales-integration.sql','utf8'));
+console.log('PASS: Discovery gates, frozen proposal revisions, manual acceptance evidence, separate Blueprint and build handoffs, fixed and recurring fees, test history by release, defect and launch gates, support handoff, reader and outsider isolation. Fixtures rolled back.');
+} catch(error) {
+ console.error(JSON.stringify({message:error.message,code:error.code,detail:error.detail,where:error.where}));process.exitCode=1;
+} finally { await db.close(); }
