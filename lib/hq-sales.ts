@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { packageLineErrors } from './hq-catalog.ts';
 
 export const DISCOVERY = [
   ['outcomes', 'What needs to improve?', 'What is breaking, why now, and how will we measure improvement? Record the baseline and target.'],
@@ -25,7 +26,7 @@ export const CATEGORIES = ['blueprint', 'implementation', 'migration', 'software
 export const CADENCES = ['one_time', 'monthly', 'annual', 'usage'] as const;
 const short = z.string().trim().max(500);
 const req = z.string().trim().min(1, 'Complete the required fields.').max(20000);
-export const lineSchema = z.object({ description: short.min(1), service: z.enum(CATEGORIES), cadence: z.enum(CADENCES), quantity_units: z.number().int().min(1).max(1000000), unit_cents: z.number().int().min(0).max(100000000), discount_cents: z.number().int().min(0).max(100000000000) }).refine(l => (l.unit_cents === 0 && l.discount_cents === 0) || l.discount_cents < Math.floor((l.quantity_units * l.unit_cents + 50) / 100), 'Discount must be less than the line value.');
+export const lineSchema = z.object({ catalog_sku:z.string().max(80).optional(), description: short.min(1), service: z.enum(CATEGORIES), cadence: z.enum(CADENCES), quantity_units: z.number().int().min(1).max(1000000), unit_cents: z.number().int().min(0).max(100000000), discount_cents: z.number().int().min(0).max(100000000000) }).refine(l => (l.unit_cents === 0 && l.discount_cents === 0) || l.discount_cents < Math.floor((l.quantity_units * l.unit_cents + 50) / 100), 'Discount must be less than the line value.');
 export type EstimateLine = z.infer<typeof lineSchema>;
 export function lineAmount(l: EstimateLine) { return Math.floor((l.quantity_units * l.unit_cents + 50) / 100) - l.discount_cents; }
 export function estimateTotals(lines: EstimateLine[]) { return lines.reduce((s,l) => { if (l.cadence !== 'usage') s[l.cadence] += lineAmount(l); return s; }, {one_time:0,monthly:0,annual:0}); }
@@ -33,7 +34,7 @@ export function decimalUnits(value: string) { if (!/^\d{1,7}(\.\d{1,2})?$/.test(
 export const opportunitySchema = z.object({ account_id: z.uuid(), title: short.min(1), kind: z.enum(['blueprint','implementation','change']), owner:z.enum(['Shawn','Neil']), next_action:short.min(1), due_on:z.iso.date() });
 export const discoverySchema = z.object({ answers:z.record(z.string(),z.object({status:z.enum(['unknown','confirmed','not_applicable']),notes:z.string().trim().max(10000)})), open_questions:z.string().trim().max(20000) });
 export const requirementSchema = z.object({ opportunity_id:z.uuid(),title:short.min(1),priority:z.enum(['must','should','later']),actor:short.min(1),steps:req,expected:req });
-export const proposalSchema = z.object({ opportunity_id:z.uuid(),title:short.min(1),valid_until:z.iso.date(),document:z.record(z.string(),z.string().trim().max(20000)),lines:z.array(lineSchema).min(1).max(50),deposit_cents:z.number().int().min(0).max(100000000000),tax_cents:z.number().int().min(0).max(100000000000),terms_reviewed:z.boolean() }).refine(v => v.deposit_cents<=estimateTotals(v.lines).one_time+v.tax_cents,'The deposit cannot exceed the one-time total.');
+export const proposalSchema = z.object({ opportunity_id:z.uuid(),title:short.min(1),valid_until:z.iso.date(),document:z.record(z.string(),z.string().trim().max(20000)),lines:z.array(lineSchema).min(1).max(50),deposit_cents:z.number().int().min(0).max(100000000000),tax_cents:z.number().int().min(0).max(100000000000),terms_reviewed:z.boolean() }).refine(v => v.deposit_cents<=estimateTotals(v.lines).one_time+v.tax_cents,'The deposit cannot exceed the one-time total.').superRefine((v,ctx)=>{for(const message of packageLineErrors(v.lines))ctx.addIssue({code:'custom',message,path:['lines']});});
 export type Opportunity = z.infer<typeof opportunitySchema> & {id:string;stage:string;discovery:z.infer<typeof discoverySchema>;updated_at:string};
 export type Requirement = z.infer<typeof requirementSchema> & {id:string;updated_at:string};
 export type Proposal = z.infer<typeof proposalSchema> & {id:string;account_id:string;family_id:string;revision:number;number:string;status:string;requirements_snapshot:Requirement[];accepted_name:string;accepted_on:string|null;evidence:string;issued_at:string|null;updated_at:string};
