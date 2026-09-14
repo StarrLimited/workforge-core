@@ -7,6 +7,8 @@ import { canWrite } from '@/lib/core';
 import { HQ_WORKSPACE_ID } from '@/lib/hq';
 import { opportunitySchema, discoverySchema, requirementSchema, proposalSchema } from '@/lib/hq-sales';
 
+import { pricebookSchema } from '@/lib/hq-estimating';
+
 const text=z.string().trim().max(20000), required=text.min(1,'Complete the required fields.');
 const owner=z.enum(['Shawn','Neil']);
 const day=z.union([z.literal(''),z.iso.date()]).transform(v=>v||null);
@@ -23,7 +25,8 @@ export async function saveSales(action:string, form:FormData):Promise<{ok:boolea
     };
     const save=(table:string,values:Record<string,unknown>)=>raw.id?update(table,values):db.from(table).insert({...values,workspace_id:HQ_WORKSPACE_ID}).select('id').single();
     let result;
-    if(action==='opportunity')result=await save('hq_opportunities',opportunitySchema.parse(input));
+    if(action==='pricebook')result=await save('hq_pricebook',pricebookSchema.parse(input));
+    else if(action==='opportunity')result=await save('hq_opportunities',opportunitySchema.parse(input));
     else if(action==='discovery')result=await update('hq_opportunities',{discovery:discoverySchema.parse(input)});
     else if(action==='requirement')result=await save('hq_requirements',requirementSchema.parse(input));
     else if(action==='proposal'){
