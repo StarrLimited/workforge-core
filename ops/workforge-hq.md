@@ -3,6 +3,12 @@
 WorkForge HQ manages the internal WorkForge business at `/hq`, using the existing
 application and Supabase project. It is separate from Field customer workspaces.
 
+The initial release is a sales and implementation foundation. It is not yet a
+complete SaaS business operating system. The owner's September 14 feedback and
+the proposed business model are recorded in `ops/workforge-hq-saas-design.md`.
+HQ members now land in HQ after sign-in; product workspaces require an explicit
+selection from their authorized workspaces.
+
 ## Included
 
 - Staff workspace and membership-based access using the existing sign-in system.
@@ -41,7 +47,8 @@ activation. The live portal is https://workforge-development.vercel.app/hq.
 
 - Production build succeeded on Next.js 16.3.4.
 - TypeScript passed.
-- All 34 Node tests passed, including HQ commercial/dashboard and intake tests.
+- All 36 Node tests passed, including HQ commercial/dashboard, intake, and
+  authentication-provider tests.
 - The exact HQ migration and `tests/hq-integration.sql` passed in an isolated
   PGlite 0.5.8 PostgreSQL engine. Production membership policy and audit function
   definitions were reused in the test bootstrap.
@@ -51,12 +58,9 @@ activation. The live portal is https://workforge-development.vercel.app/hq.
 - Both database suites also passed against the deployed schema in rollback-only
   transactions. All fixture users and fixture receipts were confirmed absent.
 - Local browser QA was blocked by `net::ERR_BLOCKED_BY_CLIENT` when the browser
-  attempted to reach localhost. Signed-in browser verification remains required.
-- The canonical live `/hq` route was opened successfully and showed the existing
-  email sign-in screen. A signed-in dashboard session has not yet been verified.
-- The configured email contains a sign-in link. The login screen now explains
-  that link flow and no longer asks for a code. Failed callbacks show recovery
-  guidance. Request and open links in the same browser for the existing PKCE flow.
+  attempted to reach localhost. Production Google sign-in and authenticated HQ
+  access were subsequently verified with the owner's account on September 14.
+  See `ops/google-sign-in.md` for the activation and verification record.
 
 ## Website intake mapping
 

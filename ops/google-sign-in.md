@@ -53,9 +53,9 @@ provider flag alone is not a completed sign-in test.
   consent for name/profile picture/email, callback, and authenticated portal.
 - Selecting WorkForge HQ opened `/hq` and its overview, pipeline, customer
   accounts, implementations, tasks, calendar, and commercial navigation.
-- The callback currently opens the product workspace view at `/`. Select
-  WorkForge HQ from its workspace menu to enter the internal system. Existing
-  signed-in sessions can open `/hq` directly.
+- The callback returns to `/`, which defaults to HQ for existing HQ members.
+  Explicit product-workspace selections remain available through membership-
+  scoped links. Customer-only users still enter their own product workspace.
 - The configured Site URL and allowed application callback match the table above.
   Nonce checks remain enabled, and accounts without email are not allowed.
 - No authorization logic changed during provider activation. The existing HQ

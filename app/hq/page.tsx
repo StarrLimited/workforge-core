@@ -12,5 +12,6 @@ export const metadata: Metadata = { title: 'WorkForge HQ | Internal operations',
 export default async function HQPage() {
   const workspaces = await loadWorkspaces();
   if (!workspaces.some(w => w.id === HQ_WORKSPACE_ID)) return <main className="login-card"><BrandLogo plate/><h1>WorkForge HQ</h1><p>This workspace is available to the WorkForge team. Your account does not currently have access.</p><a href="/">Return to your workspaces</a></main>;
-  return <HQWorkbench data={await loadHQ()} />;
+  const productWorkspace = workspaces.find(w => w.id !== HQ_WORKSPACE_ID);
+  return <HQWorkbench data={await loadHQ()} productWorkspaceId={productWorkspace?.id} />;
 }
