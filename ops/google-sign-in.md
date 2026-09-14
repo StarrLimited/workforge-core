@@ -46,10 +46,21 @@ provider flag alone is not a completed sign-in test.
 
 ## Current verification
 
-- The live provider settings reported `google: false` on September 14, 2026.
-- Google Cloud returned “Site Unavailable” in the browser used for setup.
-- Supabase provider administration requires a signed-in dashboard session.
-- Provider connection and a complete Google sign-in remain pending.
+- Google was enabled in the existing Supabase project on September 14, 2026,
+  after the owner supplied the Google client configuration directly.
+- The production login page displayed the Google button as its primary option.
+- A complete Google sign-in with the owner's account succeeded: account chooser,
+  consent for name/profile picture/email, callback, and authenticated portal.
+- Selecting WorkForge HQ opened `/hq` and its overview, pipeline, customer
+  accounts, implementations, tasks, calendar, and commercial navigation.
+- The callback currently opens the product workspace view at `/`. Select
+  WorkForge HQ from its workspace menu to enter the internal system. Existing
+  signed-in sessions can open `/hq` directly.
+- The configured Site URL and allowed application callback match the table above.
+  Nonce checks remain enabled, and accounts without email are not allowed.
+- No authorization logic changed during provider activation. The existing HQ
+  membership and RLS tests remain the access-control verification; a separate
+  non-member Google login was not exercised during this browser test.
 
 ## References
 
