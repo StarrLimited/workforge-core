@@ -39,6 +39,9 @@ Catalog identity is retained in proposal line snapshots. Existing issued/accepte
 - TypeScript and optimized Next.js production build passed.
 - All six isolated PostgreSQL suites passed, including the package migration and rollback-only acceptance/fee-handoff checks.
 - The exact package migration and package integration suite passed together in a rollback-only transaction against the existing WorkForge project.
-- Production release and browser verification will be recorded after rollout.
+- PR #9 merged as `2edf7d218fd21a36c0609ae72c40d4ca85e992da`; Vercel reported success and the canonical version endpoint returned HQ 0.7.0. The deployed tree matches the locally tested tree.
+- The live catalog showed all three package prices and six monthly services. Browser verification selected Operations + Automation Essentials + AI Assistant, applied the package, preserved a previously entered objective, saved and reopened the draft, and verified $6,940 one time, $347/month and $3,470 initial payment. All six fee lines and full scope appeared in the agreement preview.
+- No application errors were observed in the agreement preview; an unrelated browser-extension metadata error was excluded. The temporary draft and engagement were removed with exact identity/status guards; the existing WORKFLOW TESTING customer and original proposal were preserved. No email, signatures, subscription activation or customer charge occurred.
+- The deployed package integration suite passed again in a rollback-only transaction. Existing private-table/password advisories were unchanged; no new findings concerned the package objects.
 
 No new hosting project, paid service or customer-facing publication outside HQ is required.
