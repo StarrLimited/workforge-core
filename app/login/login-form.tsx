@@ -2,12 +2,55 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { signInCallbackUrl } from '@/lib/auth-redirect';
-export default function LoginForm(){
-  const [email,setEmail]=useState('');const [code,setCode]=useState('');const [sent,setSent]=useState(false);const [busy,setBusy]=useState(false);const [error,setError]=useState('');
-  async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try {const db=createClient();
-    if(sent){const {error}=await db.auth.verifyOtp({email:email.trim(),token:code.trim(),type:'email'});if(error)throw error;window.location.assign('/');}
-    else{const {error}=await db.auth.signInWithOtp({email:email.trim(),options:{emailRedirectTo:signInCallbackUrl(window.location.href)}});if(error)throw error;setSent(true);}
-  }catch(e){setError(e instanceof Error?e.message:'Sign-in failed. Please retry.');}finally{setBusy(false);}}
-  async function google(){setBusy(true);setError('');const {error}=await createClient().auth.signInWithOAuth({provider:'google',options:{redirectTo:signInCallbackUrl(window.location.href)}});if(error){setError(error.message);setBusy(false);}}
-  return <><form onSubmit={submit}><label>Email address<input type="email" autoComplete="email" required value={email} disabled={sent} onChange={e=>setEmail(e.target.value)}/></label>{sent&&<><p className="notice">Check your email for the sign-in link or verification code.</p><label>Verification code<input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={e=>setCode(e.target.value)}/></label></>}{error&&<p role="alert" className="error">{error}</p>}<button className="primary wide" disabled={busy}>{busy?'Please wait…':sent?'Verify and sign in':'Email me a sign-in link'}</button>{sent&&<button type="button" className="quiet" onClick={()=>{setSent(false);setCode('');}}>Use another email</button>}</form>{process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED==='true'&&<button className="wide secondary" onClick={google} disabled={busy}>Continue with Google</button>}</>;
+export default function LoginForm({ callbackFailed = false }: { callbackFailed?: boolean }) {
+  const [email, setEmail] = useState('');
+  const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(callbackFailed
+    ? 'That sign-in link could not be verified. Request a new link here and open it in this same browser.' : '');
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setBusy(true); setError('');
+    try {
+      const { error } = await createClient().auth.signInWithOtp({
+        email: email.trim(), options: { emailRedirectTo: signInCallbackUrl(window.location.href) },
+      });
+      if (error) throw error;
+      setSent(true);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Sign-in failed. Please retry.');
+    } finally { setBusy(false); }
+  }
+
+  async function google() {
+    setBusy(true); setError('');
+    try {
+      const { error } = await createClient().auth.signInWithOAuth({
+        provider: 'google', options: { redirectTo: signInCallbackUrl(window.location.href) },
+      });
+      if (error) throw error;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Sign-in failed. Please retry.');
+      setBusy(false);
+    }
+  }
+
+  return <>
+    {sent ? <div>
+      <div className="notice" role="status">
+        <div>
+        <strong>Check your email.</strong>
+        <p>We sent a sign-in link to {email.trim()}. Open that link in this browser to continue.</p>
+        </div>
+      </div>
+      <p className="muted small">Use the newest email. If it has not arrived, check your spam folder.</p>
+      <button type="button" className="secondary wide" onClick={() => { setSent(false); setError(''); }}>Request a new link</button>
+    </div> : <form onSubmit={submit}>
+      <label>Email address<input type="email" autoComplete="email" required value={email} disabled={busy} onChange={e => setEmail(e.target.value)}/></label>
+      <p className="muted small">We’ll email you a link to sign in. Open it in this same browser.</p>
+      <button className="primary wide" disabled={busy}>{busy ? 'Please wait…' : 'Email me a sign-in link'}</button>
+    </form>}
+    {error && <p role="alert" className="error">{error}</p>}
+    {process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true' && <button className="wide secondary" onClick={google} disabled={busy}>Continue with Google</button>}
+  </>;
 }

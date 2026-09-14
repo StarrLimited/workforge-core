@@ -54,6 +54,9 @@ activation. The live portal is https://workforge-development.vercel.app/hq.
   attempted to reach localhost. Signed-in browser verification remains required.
 - The canonical live `/hq` route was opened successfully and showed the existing
   email sign-in screen. A signed-in dashboard session has not yet been verified.
+- The configured email contains a sign-in link. The login screen now explains
+  that link flow and no longer asks for a code. Failed callbacks show recovery
+  guidance. Request and open links in the same browser for the existing PKCE flow.
 
 ## Website intake mapping
 
