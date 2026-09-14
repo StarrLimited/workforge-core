@@ -48,8 +48,12 @@ activation. The live portal is https://workforge-development.vercel.app/hq.
 - Database tests cover owner writes, agreed-fee gating, repeat-safe handoff,
   six generated tasks, frozen scope, launch gating, read-only restrictions,
   outsider isolation, RLS presence, and anonymous RPC revocation.
+- Both database suites also passed against the deployed schema in rollback-only
+  transactions. All fixture users and fixture receipts were confirmed absent.
 - Local browser QA was blocked by `net::ERR_BLOCKED_BY_CLIENT` when the browser
   attempted to reach localhost. Signed-in browser verification remains required.
+- The canonical live `/hq` route was opened successfully and showed the existing
+  email sign-in screen. A signed-in dashboard session has not yet been verified.
 
 ## Website intake mapping
 
@@ -102,9 +106,27 @@ the Webflow webhook's last-triggered status, Supabase function failures, and
 `hq_intake_receipts` for delivery. Existing website submissions were inspected
 and consist of prior setup/test inquiries; they are not imported as real leads.
 
+## Activation record — September 14, 2026
+
+- PR #1 deployed HQ; PR #2 deployed the intake source. Both Vercel deployments
+  reported success. Both HQ migrations are applied to the existing project.
+- Edge Function `hq-webflow-intake` is active, version 1. Its integration key
+  is enabled. Webflow hook `6aa78af30038252eb2317ebe` is registered for the site's
+  `form_submission` events. No additional subscription was created.
+- Live HTTP checks returned 401 for missing/incorrect keys, 200 for an
+  authenticated ignored event, 200/created for a replay of an existing labeled
+  Webflow setup test, and 200/duplicate when the same submission was replayed.
+- The resulting database record preserved the source submission ID, form family,
+  contact, campaign attribution, owner, new-inquiry stage and Denver follow-up
+  date. The test account and receipt were then removed; audit history is retained.
+- A fresh native website submission could not be completed in the cloud browser:
+  Cloudflare Turnstile reported error 600010 and kept the submit button disabled.
+  No anti-bot setting was changed. Actual Webflow webhook delivery from a fresh
+  website submission remains unobserved; backend replay is not proof of that hop.
+
 ## Remaining connections
 
-- Observe a live website-to-HQ submission after activating the webhook.
+- Verify a fresh website submission through Webflow's registered webhook.
 - SCL Executive summary feed.
 - Accounting, invoice generation, payment charging, Google Calendar sync, and
   AI/hosting cost attribution are not connected in this initial release.
