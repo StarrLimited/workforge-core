@@ -1,0 +1,7 @@
+.google-login { margin-bottom: 24px; }
+.google-login p { line-height: 1.6; margin: 14px 0 10px; }
+.google-sign-in { display: flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; border-radius: 4px; min-height: 44px; }
+.google-sign-in img { display: block; width: 216px; height: auto; max-width: 100%; }
+.google-sign-in:hover { background: transparent; filter: brightness(.97); }
+.google-sign-in:disabled { opacity: .6; cursor: wait; }
+.google-sign-in:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
