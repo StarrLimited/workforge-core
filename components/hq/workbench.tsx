@@ -20,7 +20,7 @@ const NAV = [
 const money = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(cents / 100);
 const todayInDenver = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Denver', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 
-export default function HQWorkbench({ data: d }: { data: HQData }) {
+export default function HQWorkbench({ data: d, productWorkspaceId }: { data: HQData; productWorkspaceId?: string }) {
   const router = useRouter();
   const [view, setView] = useState<View>('overview');
   const [mobile, setMobile] = useState(false);
@@ -83,7 +83,7 @@ export default function HQWorkbench({ data: d }: { data: HQData }) {
     <aside className={`hq-sidebar ${mobile ? 'open' : ''}`}><div className="hq-brand"><BrandLogo/><button className="hq-mobile icon-button" aria-label="Close navigation" onClick={() => setMobile(false)}><X/></button></div>
       <div className="hq-workspace"><span>INTERNAL OPERATIONS</span><strong>WorkForge HQ</strong><small>Business workspace</small></div>
       <nav aria-label="WorkForge HQ">{NAV.map(n => <button key={n.id} aria-current={view === n.id ? 'page' : undefined} className={view === n.id ? 'active' : ''} onClick={() => navigate(n.id)}><n.icon size={19}/>{n.label}{n.id === 'tasks' && d.tasks.some(t => !t.completed) && <span>{d.tasks.filter(t => !t.completed).length}</span>}</button>)}</nav>
-      <div className="hq-sidebar-bottom"><a href="/">Open product workspaces <ArrowRight size={15}/></a><small>{d.role.replace('_', ' ')} access</small><button onClick={async () => { await signOut(); router.push('/login'); }}><LogOut size={17}/>Sign out</button></div>
+      <div className="hq-sidebar-bottom">{productWorkspaceId && <a href={`/?workspace=${encodeURIComponent(productWorkspaceId)}`}>Open product workspaces <ArrowRight size={15}/></a>}<small>{d.role.replace('_', ' ')} access</small><button onClick={async () => { await signOut(); router.push('/login'); }}><LogOut size={17}/>Sign out</button></div>
     </aside>
     {mobile && <button className="hq-scrim" aria-label="Close navigation" onClick={() => setMobile(false)}/>}
     <div className="hq-main-shell"><header className="hq-topbar"><div><button className="hq-mobile icon-button" aria-label="Open navigation" onClick={() => setMobile(true)}><Menu/></button><span>WorkForge</span><ChevronRight size={15}/><strong>HQ</strong></div><span className="hq-internal">Internal workspace</span></header>
