@@ -29,7 +29,7 @@ export default function SalesWorkbench({data:d,sales:s,initialAccount}:{data:HQD
  const project=s.projects.find(p=>p.opportunity_id===o?.id);
  useEffect(()=>{const handler=(e:BeforeUnloadEvent)=>{if(dirty){e.preventDefault();e.returnValue='';}};window.addEventListener('beforeunload',handler);return()=>window.removeEventListener('beforeunload',handler);},[dirty]);
  function leave(){if(!dirty||window.confirm('Discard unsaved discovery changes?')){setDirty(false);return true;}return false;}
- function edit(e:Editor){setError('');setEditor(e);}
+ function edit(e:Editor){if(dirty){setError('Save your discovery changes before opening another form.');return;}setError('');setEditor(e);}
  async function run(kind:string,payload:Record<string,unknown>,record?:Record<string,any>){
   if(busy)return;setBusy(true);setError('');setMessage('');
   const fd=new FormData();fd.set('payload',JSON.stringify(payload));if(record){fd.set('id',record.id);fd.set('updated_at',record.updated_at??'');}

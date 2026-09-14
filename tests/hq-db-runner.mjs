@@ -35,6 +35,7 @@ await db.exec(readFileSync(root+'/supabase/migrations/20260914160624_hq_leads_su
 await db.exec(readFileSync(root+'/tests/hq-lifecycle-integration.sql','utf8'));
 console.log('PASS: Google and Meta intake, test isolation, duplicate delivery, failed receipt recovery, sales handoff, support launch gate, subscription and ticket lifecycle, read-only/outsider isolation and secret protection. Fixtures rolled back.');
 await db.exec(readFileSync(root+'/supabase/migrations/20260914201937_hq_sales_delivery.sql','utf8'));
+await db.exec(readFileSync(root+'/supabase/migrations/20260914204705_hq_sales_indexes.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-intake-integration.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-sales-integration.sql','utf8'));
 console.log('PASS: Discovery gates, frozen proposal revisions, manual acceptance evidence, separate Blueprint and build handoffs, fixed and recurring fees, test history by release, defect and launch gates, support handoff, reader and outsider isolation. Fixtures rolled back.');

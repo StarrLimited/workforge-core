@@ -21,7 +21,9 @@ Record funding evidence, complete checklist evidence, identify the release, and 
 - All new routes/actions use HQ membership. New tables use RLS and audit triggers. Issued documents are immutable and beta logs are append-only. Acceptance/handoff is atomic and repeat-safe.
 - `npm test`: 51 passing tests. `npm run build`: passed.
 - `PGLITE_MODULE=/path/to/@electric-sql/pglite/dist/index.js node tests/hq-db-runner.mjs`: isolated migration and workflow/access suites, including website intake after the new migration. Fixtures roll back.
-- Production migration, deployment and signed-in browser verification are recorded below when complete.
+- Production: `hq_sales_delivery` and `hq_sales_indexes` applied successfully. Existing counts reconciled; the rollback-only sales integration suite passed against the live database. The composite foreign-key indexes flagged by the advisor were added. New sales tables have no security findings.
+- PR #7 merged as `9398dbba1426463911e14b651133292125042774`; Vercel production succeeded. Authenticated desktop browser checks passed for inquiry creation, ten-section discovery save, deliverable save, estimate save/issue, customer document preview, acceptance handoff, project update, checklist evidence and beta result persistence. One fixture account was used; no real customer was signed, contacted or charged. Remaining checklist prerequisites were simulated in the fixture database; automated SQL tests exercised failed tests, blocked launch, customer release approval and support handoff.
+- Visual review checked the live agreement/workspace layouts. A follow-up corrects header-logo stretching and prevents opening another editor while discovery changes are unsaved. Responsive CSS is included; tablet interaction and an exported PDF file were not independently verified in this browser.
 
 ## Boundaries and follow-on work
 
