@@ -30,4 +30,7 @@ console.log('PASS: HQ migration, owner writes, idempotent handoff, six tasks, la
 await db.exec(readFileSync(root+'/supabase/migrations/20260914053812_workforge_hq_intake.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-intake-integration.sql','utf8'));
 console.log('PASS: Webflow authentication, submission deduplication, atomic rollback, field mapping, client RPC and key isolation. Fixtures rolled back.');
+await db.exec(readFileSync(root+'/supabase/migrations/20260914160624_hq_leads_support.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-lifecycle-integration.sql','utf8'));
+console.log('PASS: Google and Meta intake, test isolation, duplicate delivery, failed receipt recovery, sales handoff, support launch gate, subscription and ticket lifecycle, read-only/outsider isolation and secret protection. Fixtures rolled back.');
 await db.close();

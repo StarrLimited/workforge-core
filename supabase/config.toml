@@ -4,3 +4,8 @@ project_id = "workforge-core"
 # Custom 256-bit integration key; the RPC verifies its hash before any write.
 verify_jwt = false
 entrypoint = "./functions/hq-webflow-intake/index.ts"
+
+[functions.hq-ad-intake]
+# Google secret-key hash / Meta HMAC; retries verify staff JWT and membership.
+verify_jwt = false
+entrypoint = "./functions/hq-ad-intake/index.ts"

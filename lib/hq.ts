@@ -22,7 +22,30 @@ export type HQTask = { id: string; account_id: string | null; implementation_id:
 export type HQEngagement = { id: string; account_id: string; service: typeof HQ_SERVICES[number]; description: string; cadence: 'one_time' | 'monthly'; amount_cents: number; paid_cents: number; status: 'proposed' | 'agreed' | 'ended'; updated_at: string };
 export type HQEvent = { id: string; account_id: string | null; title: string; owner: string; starts_at: string; ends_at: string; notes: string; updated_at: string };
 export type HQActivity = { id: string; action: string; created_at: string };
-export type HQData = { role: Role; accounts: HQAccount[]; implementations: HQImplementation[]; tasks: HQTask[]; engagements: HQEngagement[]; events: HQEvent[]; activity: HQActivity[] };
+export type HQSupportPlan = { id: string; account_id: string; owner: string; terms: string; next_review_on: string; launched_at: string | null; updated_at: string };
+export type HQTicket = { id: string; account_id: string; title: string; description: string; priority: 'urgent' | 'high' | 'normal' | 'low'; status: 'open' | 'in_progress' | 'waiting_customer' | 'resolved'; owner: string; response_due_at: string; first_response_at: string | null; resolution: string; resolved_at: string | null; updated_at: string };
+export type HQSubscription = { id: string; account_id: string; plan: string; service: 'software' | 'support'; cadence: 'monthly' | 'annual'; amount_cents: number; status: 'pending' | 'trial' | 'active' | 'paused' | 'cancelled'; starts_on: string; renews_on: string; ends_on: string | null; payment_status: 'unknown' | 'current' | 'past_due'; notes: string; updated_at: string };
+export type HQAdIntegration = { provider: 'google_ads' | 'meta'; enabled: boolean; default_owner: string; page_id: string; form_ids: string[]; last_received_at: string | null; last_test_at: string | null; last_error: string };
+export type HQAdReceipt = { provider: string; external_id: string; account_id: string | null; form_id: string; status: string; error_code: string; attribution: Record<string, unknown>; updated_at: string };
+export type HQData = { role: Role; accounts: HQAccount[]; implementations: HQImplementation[]; tasks: HQTask[]; engagements: HQEngagement[]; events: HQEvent[]; activity: HQActivity[]; supportPlans: HQSupportPlan[]; tickets: HQTicket[]; subscriptions: HQSubscription[]; adIntegrations: HQAdIntegration[]; adReceipts: HQAdReceipt[] };
+
+export function subscriptionMRR(subscriptions: HQSubscription[], today: string) {
+  return subscriptions.filter(s => s.status === 'active' && s.starts_on <= today && (!s.ends_on || s.ends_on > today))
+    .reduce((total, s) => total + (s.cadence === 'annual' ? s.amount_cents / 12 : s.amount_cents), 0);
+}
+
+export function workflowIssues(d: HQData, today: string) {
+  const issues: { accountId: string; message: string }[] = [];
+  for (const a of d.accounts) {
+    const i = d.implementations.find(i => i.account_id === a.id);
+    if (a.stage === 'won' && !i) issues.push({ accountId: a.id, message: 'Won account has no implementation.' });
+    if (i && !i.target_on && i.status !== 'live') issues.push({ accountId: a.id, message: 'Set the implementation target date.' });
+    if (i?.blocker) issues.push({ accountId: a.id, message: i.blocker });
+    if (i && i.status !== 'live' && i.target_on && i.target_on < today) issues.push({ accountId: a.id, message: 'Implementation target date is overdue.' });
+    if (i && !d.supportPlans.some(p => p.account_id === a.id)) issues.push({ accountId: a.id, message: 'Define the support handoff before launch.' });
+  }
+  return issues;
+}
 
 export function hqMetrics(data: Pick<HQData, 'accounts' | 'implementations' | 'tasks' | 'engagements'>, today: string) {
   const agreed = data.engagements.filter(e => e.status === 'agreed');
