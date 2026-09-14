@@ -1,16 +1,16 @@
 import { z } from 'zod';
 
 export const DISCOVERY = [
-  ['outcomes', 'Problem & success', 'What is breaking, why now, and how will we measure improvement? Record the baseline and target.'],
-  ['people', 'Buyer & users', 'Name the decision-maker, signer, daily users, beta lead, and launch approver.'],
-  ['workflow', 'Current workflow & exceptions', 'Walk through a real item from intake to payment/support. Include changes, cancellations, duplicates, and failed handoffs.'],
-  ['roles', 'Roles & devices', 'Who can view, edit, approve, or send? Identify customer boundaries, tablets/mobile, browsers, and offline needs.'],
-  ['systems', 'Systems & integrations', 'What stays or is replaced? Record the source of truth, API feasibility, sync direction, retries, owner, and vendor fees.'],
-  ['migration', 'Data migration', 'Record data/history/attachments, volume, export sample, mapping, cleanup, reconciliation, and cutover owner.'],
-  ['rules', 'Business rules & documents', 'Confirm calculations, approval limits, reports, estimates, invoices, sender identities, and accounting responsibilities.'],
-  ['automation', 'Automation & AI', 'Define permitted actions/data, human approvals, fallback, spend limits, and failure handling.'],
-  ['security', 'Data & reliability', 'Identify sensitive data, retention, access removal, backups/recovery, peak volumes, and performance needs.'],
-  ['commercial', 'Budget, timing & support', 'Separate setup and recurring budgets. Name customer dependencies, deadlines, support expectations, and export/exit needs.'],
+  ['outcomes', 'What needs to improve?', 'What is breaking, why now, and how will we measure improvement? Record the baseline and target.'],
+  ['people', 'Who is involved?', 'Name the decision-maker, signer, daily users, beta lead, and launch approver.'],
+  ['workflow', 'How does the work happen today?', 'Walk through a real item from intake to payment/support. Include changes, cancellations, duplicates, and failed handoffs.'],
+  ['roles', 'Who can do what?', 'Who can view, edit, approve, or send? Identify customer boundaries, tablets/mobile, browsers, and offline needs.'],
+  ['systems', 'Which apps need to work together?', 'What stays or is replaced? Record the source of truth, API feasibility, sync direction, retries, owner, and vendor fees.'],
+  ['migration', 'What information needs to move?', 'Record data/history/attachments, volume, export sample, mapping, cleanup, reconciliation, and cutover owner.'],
+  ['rules', 'How do pricing and paperwork work?', 'Confirm calculations, approval limits, reports, estimates, invoices, sender identities, and accounting responsibilities.'],
+  ['automation', 'What should happen automatically?', 'Define permitted actions/data, human approvals, fallback, spend limits, and failure handling.'],
+  ['security', 'What needs protection?', 'Identify sensitive data, retention, access removal, backups/recovery, peak volumes, and performance needs.'],
+  ['commercial', 'What is the budget and timeline?', 'Separate setup and recurring budgets. Name customer dependencies, deadlines, support expectations, and export/exit needs.'],
 ] as const;
 export const DOC_FIELDS = [
   ['seller', 'Provider legal name & address'], ['customer', 'Customer legal name & address'],
@@ -25,7 +25,7 @@ export const CATEGORIES = ['blueprint', 'implementation', 'migration', 'software
 export const CADENCES = ['one_time', 'monthly', 'annual', 'usage'] as const;
 const short = z.string().trim().max(500);
 const req = z.string().trim().min(1, 'Complete the required fields.').max(20000);
-export const lineSchema = z.object({ description: short.min(1), service: z.enum(CATEGORIES), cadence: z.enum(CADENCES), quantity_units: z.number().int().min(1).max(1000000), unit_cents: z.number().int().min(1).max(100000000), discount_cents: z.number().int().min(0).max(100000000000) }).refine(l => l.discount_cents < Math.floor((l.quantity_units * l.unit_cents + 50) / 100), 'Discount must be less than the line value.');
+export const lineSchema = z.object({ description: short.min(1), service: z.enum(CATEGORIES), cadence: z.enum(CADENCES), quantity_units: z.number().int().min(1).max(1000000), unit_cents: z.number().int().min(0).max(100000000), discount_cents: z.number().int().min(0).max(100000000000) }).refine(l => (l.unit_cents === 0 && l.discount_cents === 0) || l.discount_cents < Math.floor((l.quantity_units * l.unit_cents + 50) / 100), 'Discount must be less than the line value.');
 export type EstimateLine = z.infer<typeof lineSchema>;
 export function lineAmount(l: EstimateLine) { return Math.floor((l.quantity_units * l.unit_cents + 50) / 100) - l.discount_cents; }
 export function estimateTotals(lines: EstimateLine[]) { return lines.reduce((s,l) => { if (l.cadence !== 'usage') s[l.cadence] += lineAmount(l); return s; }, {one_time:0,monthly:0,annual:0}); }

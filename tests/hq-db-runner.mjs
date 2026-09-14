@@ -39,6 +39,10 @@ await db.exec(readFileSync(root+'/supabase/migrations/20260914204705_hq_sales_in
 await db.exec(readFileSync(root+'/tests/hq-intake-integration.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-sales-integration.sql','utf8'));
 console.log('PASS: Discovery gates, frozen proposal revisions, manual acceptance evidence, separate Blueprint and build handoffs, fixed and recurring fees, test history by release, defect and launch gates, support handoff, reader and outsider isolation. Fixtures rolled back.');
+await db.exec(readFileSync(root+'/supabase/migrations/20260914215148_hq_estimate_signing_pricebook.sql','utf8'));
+await db.exec(readFileSync(root+'/supabase/migrations/20260914221058_hq_estimate_permissions.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-estimating-integration.sql','utf8'));
+console.log('PASS: Unpriced drafts, issue gate, scoped pricebook, dual signatures, exact document fingerprint, consent, recipient match, repeated signing, expiry and atomic project handoff. Fixtures rolled back.');
 } catch(error) {
  console.error(JSON.stringify({message:error.message,code:error.code,detail:error.detail,where:error.where}));process.exitCode=1;
 } finally { await db.close(); }

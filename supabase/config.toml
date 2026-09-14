@@ -9,3 +9,6 @@ entrypoint = "./functions/hq-webflow-intake/index.ts"
 # Google secret-key hash / Meta HMAC; retries verify staff JWT and membership.
 verify_jwt = false
 entrypoint = "./functions/hq-ad-intake/index.ts"
+
+[functions.hq-gmail]
+verify_jwt = false

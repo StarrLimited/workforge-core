@@ -1,2 +1,2 @@
 export const dynamic='force-dynamic';
-export function GET(){return Response.json({product:'WorkForge Field',version:'0.4.2'},{headers:{'Cache-Control':'no-store'}});}
+export function GET(){return Response.json({product:'WorkForge Field',version:'0.4.2',hqVersion:'0.6.0'},{headers:{'Cache-Control':'no-store'}});}
