@@ -46,6 +46,9 @@ console.log('PASS: Unpriced drafts, issue gate, scoped pricebook, dual signature
 await db.exec(readFileSync(root+'/supabase/migrations/20260914233140_hq_field_packages.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-packages-integration.sql','utf8'));
 console.log('PASS: Approved package pricing, required Managed/setup fees, mutually exclusive plans, Blueprint double-charge protection, immutable issued prices and separate fixed/recurring handoff. Fixtures rolled back.');
+await db.exec(readFileSync(root+'/supabase/migrations/20260915201632_hq_field_solo.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-solo-integration.sql','utf8'));
+console.log('PASS: Solo pricing, optional Care, mutually exclusive support, required Managed for add-ons, preserved issued prices and acceptance handoff. Fixtures rolled back.');
 } catch(error) {
  console.error(JSON.stringify({message:error.message,code:error.code,detail:error.detail,where:error.where}));process.exitCode=1;
 } finally { await db.close(); }
