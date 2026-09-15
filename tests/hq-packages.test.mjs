@@ -4,6 +4,44 @@ import {CATALOG,catalogDescription,buildPackageOffer,packageLineErrors,lineFromP
 import {estimateTotals,proposalSchema} from '../lib/hq-sales.ts';
 const items=CATALOG.map((o,i)=>({...o,id:String(i),unit_cents:o.price,unit_label:o.cadence==='monthly'?'month':'project',active:true,description:catalogDescription(o),updated_at:'2026-09-14T00:00:00Z'}));
 
+test('Solo quotes the approved scope with optional Care and the correct milestone payments',()=>{
+  const offer=buildPackageOffer('WF-FIELD-SOLO',['WF-SOLO-CARE'],items);
+  assert.deepEqual(estimateTotals(offer.lines),{one_time:149500,monthly:9900,annual:0});
+  assert.equal(offer.deposit_cents,74750);
+  for(const text of ['250 contacts','50 pricebook items','10 open jobs','45-minute','60-minute','One configuration revision','14 days','1–2 weeks','not ongoing customer or job limits'])assert.ok(offer.document.scope.includes(text),text);
+  assert.ok(offer.document.support.includes('15 minutes'));
+  assert.ok(!offer.document.support.includes('30 minutes'));
+  assert.ok(offer.document.exclusions.includes('crew or branch management setup'));
+  assert.ok(!offer.document.payment.includes('Blueprint is included'));
+  assert.ok(offer.document.payment.includes('$747.50'));
+  assert.ok(offer.document.payment.includes('$448.50'));
+  assert.ok(offer.document.payment.includes('$299.00'));
+  const standalone=buildPackageOffer('WF-FIELD-SOLO',[],items);
+  assert.equal(estimateTotals(standalone.lines).monthly,0);
+  assert.ok(standalone.document.subscription.includes('No WorkForge monthly'));
+});
+
+test('Solo add-ons replace Care with exactly one Managed plan and required setup',()=>{
+  for(const [extra,oneTime,monthly] of [['WF-AUTO-ESSENTIALS',199000,24800],['WF-AI-ASSISTANT',199000,24800],['WF-IMPROVEMENT',149500,39800]]){
+    const offer=buildPackageOffer('WF-FIELD-SOLO',['WF-SOLO-CARE',extra],items);
+    assert.deepEqual(estimateTotals(offer.lines),{one_time:oneTime,monthly,annual:0});
+    assert.equal(offer.lines.filter(l=>l.catalog_sku==='WF-MANAGED').length,1);
+    assert.ok(!offer.lines.some(l=>l.catalog_sku==='WF-SOLO-CARE'));
+    assert.ok(offer.document.support.includes('30 minutes'));
+  }
+  assert.equal(estimateTotals(buildPackageOffer('WF-FIELD-SOLO',['WF-SOLO-CARE','WF-MANAGED'],items).lines).monthly,14900);
+});
+
+test('Manual estimates cannot double-charge care or attach Solo Care to larger packages',()=>{
+  const line=s=>lineFromPricebook(items.find(i=>i.sku===s));
+  assert.match(packageLineErrors(['WF-FIELD-SOLO','WF-SOLO-CARE','WF-MANAGED'].map(line)).join(' '),/replaces Solo Care/);
+  assert.match(packageLineErrors(['WF-FIELD-FOUNDATION','WF-SOLO-CARE'].map(line)).join(' '),/available for Field Solo/);
+  assert.match(packageLineErrors(['WF-FIELD-SOLO','WF-SOLO-CARE','WF-AI-ASSISTANT','WF-AI-ASSISTANT-SETUP'].map(line)).join(' '),/requires WorkForge Managed/);
+  assert.match(packageLineErrors(['WF-FIELD-SOLO','WF-FIELD-FOUNDATION'].map(line)).join(' '),/one Field implementation/);
+  assert.throws(()=>buildPackageOffer('WF-FIELD-FOUNDATION',['WF-SOLO-CARE'],items),/available for Field Solo/);
+  assert.deepEqual(packageLineErrors([line('WF-SOLO-CARE')]),[]);
+});
+
 test('Approved packages reproduce the quoted build and managed totals with complete scope',()=>{
   for(const [sku,price] of [['WF-FIELD-FOUNDATION',295000],['WF-FIELD-OPERATIONS',595000],['WF-FIELD-SCALE',995000]]){
     const offer=buildPackageOffer(sku,['WF-MANAGED'],items);
