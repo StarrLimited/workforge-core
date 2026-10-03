@@ -63,10 +63,30 @@ export function normalizeMeta(body, event) {
   if (String(body.id) !== event.external_id || (body.form_id && String(body.form_id) !== event.form_id)) fail('lead_identity_mismatch');
   if (!Array.isArray(body.field_data) || body.field_data.length > 100) fail();
   const fields = Object.fromEntries(body.field_data.map(f => [value(f.name,100), Array.isArray(f.values) ? f.values.map(v => value(v,2000)).join(', ') : '']));
+  if (Object.values(fields).some(v => v.startsWith('<test lead: dummy data'))) return { ...event, status:'test', submitted_at:submitted(body.created_time) };
   const attribution = { page_id: event.page_id, ...Object.fromEntries(['ad_id','adset_id','campaign_id','ad_name','adset_name','campaign_name'].filter(k=>body[k]).map(k=>[k,value(body[k],500)])), answers: fields };
   if (JSON.stringify(attribution).length > 14000) fail('answers_too_large');
   return { ...event, status: 'received', submitted_at: submitted(body.created_time), ...contact({ name: fields.full_name || [fields.first_name,fields.last_name].filter(Boolean).join(' '), email: fields.email || fields.work_email, phone: fields.phone_number || fields.work_phone_number, company: fields.company_name }),
     attribution, notes: 'Meta lead form\n' + Object.entries(fields).map(([k,v])=>`${k}: ${v}`).join('\n'), scope: '' };
+}
+export function normalizeRelay(body, provider) {
+  const custom=body.customData ?? {};
+  if(!custom || typeof custom!=='object' || Array.isArray(custom)) fail('invalid_custom_data');
+  const b={...body,...custom};
+  const form_id=id(b.form_id);
+  const external_id=b.lead_id?id(b.lead_id):`ghl:${id(b.contact_id)}:${form_id}`;
+  if(external_id.length>200) fail('identifier_too_long');
+  const page_id=provider==='meta'?id(b.page_id):'';
+  const base={external_id,form_id,page_id,submitted_at:submitted(b.submitted_at)};
+  if(b.is_test!=null && ![true,false,'true','false'].includes(b.is_test)) fail('invalid_test_flag');
+  if(b.is_test===true || b.is_test==='true') return {...base,status:'test'};
+  const answers=b.answers??{};
+  if(!answers || typeof answers!=='object' || Array.isArray(answers) || Object.keys(answers).length>100) fail('invalid_answers');
+  const fields=Object.fromEntries(Object.entries(answers).map(([k,v])=>[value(k,100),value(v,2000)]));
+  const attribution={transport:'ghl',answers:fields};
+  for(const k of ['campaign_id','campaign_name','ad_id','ad_name','gclid','fbclid']) if(b[k]) attribution[k]=value(b[k],1000);
+  if(JSON.stringify(attribution).length>14000) fail('answers_too_large');
+  return {...base,status:'received',...contact({name:b.full_name || [b.first_name,b.last_name].filter(Boolean).join(' '),email:b.email,phone:b.phone || b.phone_number,company:b.company_name}),attribution,notes:`${provider==='meta'?'Meta':'Google Ads'} inquiry via GoHighLevel\n`+Object.entries(fields).map(([k,v])=>`${k}: ${v}`).join('\n'),scope:''};
 }
 async function readBody(req) {
   if (Number(req.headers.get('content-length')) > MAX_BYTES) throw new IntakeError(413,'request_too_large');
@@ -114,14 +134,25 @@ export function createHandler({ supabaseUrl, serviceKey, fetcher = fetch }) {
       const url = new URL(req.url); const provider = url.searchParams.get('provider');
       if (!['google_ads','meta'].includes(provider)) throw new IntakeError(404,'unknown_connection');
       if (!['POST','GET'].includes(req.method)) throw new IntakeError(405,'method_not_allowed');
-      const config = await rpc('hq_ad_config',{p_provider:provider});
+      const relay=url.searchParams.get('transport')==='relay';
+      const config = await rpc(relay?'hq_relay_config':'hq_ad_config',{p_provider:provider});
       if (!config) throw new IntakeError(503,'connection_not_enabled');
       if (req.method==='GET') {
+        if(relay) throw new IntakeError(405,'method_not_allowed');
         if (provider!=='meta' || url.searchParams.get('hub.mode')!=='subscribe' || await hash(url.searchParams.get('hub.verify_token')||'')!==config.key_hash) throw new IntakeError(403,'verification_failed');
         const challenge=value(url.searchParams.get('hub.challenge'),500);
         return new Response(challenge,{headers:{'Content-Type':'text/plain','Cache-Control':'no-store'}});
       }
       const raw = await readBody(req);
+      if(relay) {
+        const body=parseBody(raw);
+        const key=req.headers.get('x-workforge-key') || body.workforge_key || body.customData?.workforge_key;
+        if(await hash(value(key,1000))!==config.key_hash) throw new IntakeError(401,'invalid_key');
+        const lead=normalizeRelay(body,provider);
+        if(!config.form_ids.includes(lead.form_id) || (provider==='meta' && lead.page_id!==config.page_id)) throw new IntakeError(403,'form_not_allowed');
+        const result=await rpc('hq_receive_relay',{p_provider:provider,p_lead:lead});
+        return new Response(JSON.stringify(result),{status:200,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
+      }
       // A retry is staff-authenticated; it can only replay IDs already in HQ.
       if (url.searchParams.get('retry')==='1') {
         if (provider!=='meta') fail();
