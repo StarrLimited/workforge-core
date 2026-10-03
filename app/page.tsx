@@ -10,6 +10,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{workspa
   // Staff enter the internal business workspace; explicit product selections still work.
   const selected=workspaces.find(w=>w.id===params.workspace)??workspaces.find(w=>w.id===HQ_WORKSPACE_ID)??workspaces[0];
   if(selected.id===HQ_WORKSPACE_ID) redirect('/hq');
+  if(selected.model==='crm') redirect('/crm?workspace='+encodeURIComponent(selected.id));
   const data=await loadWorkspace(selected.id);
   return <Workbench data={data} workspaces={workspaces}/>;
 }
