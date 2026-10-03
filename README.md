@@ -79,3 +79,17 @@ npm run build
 ## Ownership and separation
 
 Development infrastructure initially belongs to the Starr Company Limited accounts, with dedicated WorkForge resources. Core source contains no live operating-company data or runtime dependency on their databases. Track deployment-specific values separately, and move repositories, application projects, database/storage/auth configuration and integration ownership into WorkForge accounts before commercial launch.
+
+## Standalone WorkForge CRM beta
+
+`/crm` is the customer CRM product, with a separate `crm` workspace model and `crm_*` records. It does not use HQ accounts or Field work orders. HQ links to its demo; the root workspace router sends CRM members to `/crm`.
+
+Included: contact and company CRUD, tags and contact restrictions, lead inbox, multiple customizable pipelines, stage probabilities, board/list views, drag/drop and keyboard-accessible stage selection, owner/source/search filters, deal outcomes with required loss reasons, automatic follow-up tasks, activity scheduling/completion, calendar-file export, notes/audit history, contact CSV import with email deduplication and atomic rollback, CSV export, weighted forecast/source reports, team access creation, and read-only roles. Data is stored in Supabase; there is no localStorage data store.
+
+Access: workspace members share CRM records. Members can edit sales records; administrators configure pipelines and add access; only owners can appoint administrators. Database RLS and composite foreign keys enforce workspace isolation. Customer-specific deployments should provision separate workspaces and memberships. Team record visibility is currently workspace-wide, not rep-private. There is no public signup or tenant creation screen.
+
+Apply `20261003225240_standalone_crm.sql` before deploying. `supabase/crm-demo-seed.sql` provisions one clearly labeled fictional demo and grants its access to the existing WorkForge HQ team without copying any HQ business records. The seed is idempotent by demo workspace name/model.
+
+Validation: `npm test`, `npm run typecheck`, `npm run build`; run `PGLITE_MODULE=/absolute/path/to/pglite/dist/index.js node tests/crm-db-runner.mjs` for database/role/workflow checks.
+
+Beta limits: email/SMS delivery, two-way calendar sync, provider lead ingestion, outbound sequences, custom fields, public web forms, appointment booking pages, attachments, bulk merge, advanced report date ranges, and existing member role/revocation controls are not yet implemented in the standalone CRM. Existing HQ lead intake is unchanged and not connected to this demo. Email/call buttons open the user's external apps. Automatic rules create CRM tasks only. The dataset loader paginates database reads to avoid silently truncating reports, but currently loads the workspace into the client; large-scale server-side search/pagination is a follow-up. No paid providers are added by this release.

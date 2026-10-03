@@ -1,5 +1,6 @@
 import type { EstimateLine, PricebookItem, FieldProfile, FinancialRecord } from './field';
 export const MODEL_PROFILES = {
+  crm: { name: 'CRM', audience: 'Sales teams and growing businesses', modules: ['contacts','companies','pipeline','activities','reporting'] },
   field: { name: 'Field', audience: 'Field service and home services', modules: ['crm', 'estimates', 'jobs', 'calendar', 'partners', 'purchasing'] },
   build: { name: 'Build', audience: 'Construction and project delivery', modules: ['crm', 'estimates', 'jobs', 'purchasing', 'changes', 'progress_billing'] },
   supply: { name: 'Supply', audience: 'Materials, distribution and logistics', modules: ['crm', 'orders', 'dispatch', 'tickets', 'reconciliation'] },
