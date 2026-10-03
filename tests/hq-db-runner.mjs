@@ -12,14 +12,14 @@ grant usage on schema auth,private to authenticated;
 grant execute on function auth.uid() to authenticated;
 create table public.workspaces(id uuid primary key,name text,model text,is_demo boolean,timezone text);
 create table public.workspace_memberships(workspace_id uuid references public.workspaces(id),user_id uuid references auth.users(id),role text,is_active boolean default true,primary key(workspace_id,user_id));
-create table private.workspace_invitations(workspace_id uuid references public.workspaces(id),email text,role text);
+create table private.workspace_invitations(id uuid primary key default gen_random_uuid(),workspace_id uuid references public.workspaces(id),email text,role text,expires_at timestamptz default now()+interval '30 days',accepted_by uuid,unique(workspace_id,email));
 create table public.audit_events(id uuid default gen_random_uuid(),workspace_id uuid,work_order_id uuid,actor_id uuid,action text,created_at timestamptz default now());
 alter table public.workspace_memberships enable row level security;
 create policy own_memberships on public.workspace_memberships for select to authenticated using(user_id=(select auth.uid()));
 grant select on public.workspace_memberships to authenticated;
 `);
 const original=readFileSync(root+'/supabase/migrations/20260910184931_workforge_core_field.sql','utf8');
-for(const fn of ['can_read','can_write','audit_change']){
+for(const fn of ['can_read','can_write','audit_change','claim_invitation']){
  const start=original.indexOf('create function private.'+fn+'(');
  const end=original.indexOf('$$;',start)+3;
  await db.exec(original.slice(start,end));
@@ -49,6 +49,9 @@ console.log('PASS: Approved package pricing, required Managed/setup fees, mutual
 await db.exec(readFileSync(root+'/supabase/migrations/20260915201632_hq_field_solo.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-solo-integration.sql','utf8'));
 console.log('PASS: Solo pricing, optional Care, mutually exclusive support, required Managed for add-ons, preserved issued prices and acceptance handoff. Fixtures rolled back.');
+await db.exec(readFileSync(root+'/supabase/migrations/20261003045400_hq_admin_lead_connections.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-admin-integration.sql','utf8'));
+console.log('PASS: HQ user administration, role isolation, invitation activation/revocation, owner protection, deactivation, relay credentials, receipt deduplication and test isolation.');
 } catch(error) {
  console.error(JSON.stringify({message:error.message,code:error.code,detail:error.detail,where:error.where}));process.exitCode=1;
 } finally { await db.close(); }

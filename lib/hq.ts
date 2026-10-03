@@ -1,3 +1,4 @@
+import type { LeadRelay } from './hq-admin';
 import type { Role } from './core';
 
 export const HQ_WORKSPACE_ID = '8ac08858-038c-41df-90a8-4a84f25cb400';
@@ -27,7 +28,7 @@ export type HQTicket = { id: string; account_id: string; title: string; descript
 export type HQSubscription = { id: string; account_id: string; plan: string; service: 'software' | 'support'; cadence: 'monthly' | 'annual'; amount_cents: number; status: 'pending' | 'trial' | 'active' | 'paused' | 'cancelled'; starts_on: string; renews_on: string; ends_on: string | null; payment_status: 'unknown' | 'current' | 'past_due'; notes: string; updated_at: string };
 export type HQAdIntegration = { provider: 'google_ads' | 'meta'; enabled: boolean; default_owner: string; page_id: string; form_ids: string[]; last_received_at: string | null; last_test_at: string | null; last_error: string };
 export type HQAdReceipt = { provider: string; external_id: string; account_id: string | null; form_id: string; status: string; error_code: string; attribution: Record<string, unknown>; updated_at: string };
-export type HQData = { role: Role; accounts: HQAccount[]; implementations: HQImplementation[]; tasks: HQTask[]; engagements: HQEngagement[]; events: HQEvent[]; activity: HQActivity[]; supportPlans: HQSupportPlan[]; tickets: HQTicket[]; subscriptions: HQSubscription[]; adIntegrations: HQAdIntegration[]; adReceipts: HQAdReceipt[] };
+export type HQData = { role: Role; accounts: HQAccount[]; implementations: HQImplementation[]; tasks: HQTask[]; engagements: HQEngagement[]; events: HQEvent[]; activity: HQActivity[]; supportPlans: HQSupportPlan[]; tickets: HQTicket[]; subscriptions: HQSubscription[]; adIntegrations: HQAdIntegration[]; adReceipts: HQAdReceipt[]; leadRelays?: LeadRelay[] };
 
 export function subscriptionMRR(subscriptions: HQSubscription[], today: string) {
   return subscriptions.filter(s => s.status === 'active' && s.starts_on <= today && (!s.ends_on || s.ends_on > today))
