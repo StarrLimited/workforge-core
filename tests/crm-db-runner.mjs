@@ -25,7 +25,7 @@ try {
  set role authenticated;select set_config('request.jwt.claim.sub','${owner}',false);`);
  const scalar=async(sql,params=[])=>Object.values((await db.query(sql,params)).rows[0])[0];
  const pipeline=await scalar('select public.crm_create_pipeline($1,$2)',[w,'Sales']);
- const stages=(await db.query('select * from public.crm_stages order by position')).rows;assert.equal(stages.length,5);
+ const stages=(await db.query('select * from public.crm_stages order by position')).rows;assert.equal(stages.length,5);assert.equal(stages[1].name,'Contacted');
  const company=await scalar('insert into public.crm_companies(workspace_id,name) values($1,$2) returning id',[w,'Demo Co']);
  const contact=await scalar('insert into public.crm_contacts(workspace_id,name,email,company_id,owner_id) values($1,$2,$3,$4,$5) returning id',[w,'Demo Person','demo@example.test',company,owner]);
  const deal=await scalar('insert into public.crm_deals(workspace_id,pipeline_id,stage_id,contact_id,title,value_cents,owner_id) values($1,$2,$3,$4,$5,10000,$6) returning id',[w,pipeline,stages[0].id,contact,'Test deal',owner]);

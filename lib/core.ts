@@ -8,9 +8,9 @@ export const MODEL_PROFILES = {
   executive: { name: 'Executive', audience: 'Portfolio and multi-company management', modules: ['portfolio', 'initiatives', 'tasks', 'calendar', 'reporting'] }
 } as const;
 export type Model = keyof typeof MODEL_PROFILES;
-export const STAGES = ['lead','appointment','estimated','approved','scheduled','in_progress','completed','invoice_ready'] as const;
+export const STAGES = ['lead','contacted','appointment','estimated','approved','scheduled','in_progress','completed','invoice_ready'] as const;
 export type Stage = typeof STAGES[number];
-export const STAGE_LABELS: Record<Stage,string> = { lead:'New lead', appointment:'Consultation', estimated:'Estimate ready', approved:'Approved', scheduled:'Scheduled', in_progress:'In progress', completed:'Completed', invoice_ready:'Invoice ready' };
+export const STAGE_LABELS: Record<Stage,string> = { lead:'New lead', contacted:'Contacted', appointment:'Consultation', estimated:'Estimate ready', approved:'Approved', scheduled:'Scheduled', in_progress:'In progress', completed:'Completed', invoice_ready:'Invoice ready' };
 export type Role = 'owner' | 'administrator' | 'member' | 'read_only';
 export const canWrite = (role: Role) => ['owner','administrator','member'].includes(role);
 export function priceForMargin(costCents: number, marginPercent: number): number {

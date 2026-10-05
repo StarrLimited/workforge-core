@@ -2,10 +2,10 @@ import type { LeadRelay } from './hq-admin';
 import type { Role } from './core';
 
 export const HQ_WORKSPACE_ID = '8ac08858-038c-41df-90a8-4a84f25cb400';
-export const HQ_STAGES = ['new', 'discovery', 'blueprint', 'proposal', 'won', 'lost'] as const;
+export const HQ_STAGES = ['new', 'contacted', 'discovery', 'blueprint', 'proposal', 'won', 'lost'] as const;
 export type HQStage = typeof HQ_STAGES[number];
 export const HQ_STAGE_LABELS: Record<HQStage, string> = {
-  new: 'New inquiry', discovery: 'Discovery', blueprint: 'Blueprint', proposal: 'Proposal', won: 'Won', lost: 'Lost',
+  new: 'New inquiry', contacted: 'Contacted', discovery: 'Discovery', blueprint: 'Blueprint', proposal: 'Proposal', won: 'Won', lost: 'Lost',
 };
 export const HQ_OWNERS = ['Shawn', 'Neil'] as const;
 export const HQ_SOURCES = ['Website', 'Google Ads', 'Google LSA', 'Meta', 'Print', 'Referral', 'Outbound', 'Other'] as const;

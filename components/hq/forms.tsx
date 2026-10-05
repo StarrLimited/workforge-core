@@ -50,6 +50,7 @@ export function HQRecordForm({ form, data, busy, error, onSubmit, onClose }: {
         </>}
         {form.kind === 'stage' && <><input type="hidden" name="expected_stage" value={form.record.stage}/>
           <label>Sales stage<select name="stage" defaultValue={form.record.stage}>{HQ_STAGES.map(s => <option key={s} value={s}>{HQ_STAGE_LABELS[s]}</option>)}</select></label>
+          <p className="hq-hint">Contacted means outreach has been sent and you are awaiting a reply or a discovery booking.</p>
           <label>Reason if lost<textarea name="lost_reason" rows={3} maxLength={1000} defaultValue={form.record.lost_reason}/></label>
           <p className="hq-hint">Use Sales & delivery to prepare and accept an agreement. Acceptance creates the scoped project and checklist; a manually entered fee does not authorize a build.</p>
         </>}

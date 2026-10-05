@@ -16,11 +16,11 @@ test('HQ separates recurring commitments from one-time collections and proposed 
 });
 test('HQ attention counts open overdue actions, excluding closed accounts and completed tasks', () => {
   const actual = hqMetrics({ ...base, accounts: [
-    { stage: 'new', due_on: '2026-09-13' }, { stage: 'won', due_on: '2026-09-12' },
+    { stage: 'new', due_on: '2026-09-13' }, { stage: 'contacted', due_on: '2026-09-13' }, { stage: 'won', due_on: '2026-09-12' },
     { stage: 'lost', due_on: '2026-09-12' }, { stage: 'proposal', due_on: '2026-09-14' },
   ], tasks: [ { completed: false, due_on: '2026-09-13' }, { completed: true, due_on: '2026-09-12' } ] }, '2026-09-14');
-  assert.equal(actual.overdue, 2);
-  assert.equal(actual.openLeads, 2);
+  assert.equal(actual.overdue, 3);
+  assert.equal(actual.openLeads, 3);
 });
 test('HQ delivery totals distinguish active work from live and paused accounts', () => {
   const actual = hqMetrics({ ...base, implementations: [{ status: 'onboarding' }, { status: 'testing' }, { status: 'live' }, { status: 'on_hold' }] }, '2026-09-14');
