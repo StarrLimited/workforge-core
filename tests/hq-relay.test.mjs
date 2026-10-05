@@ -13,3 +13,28 @@ test('relay rejects wrong key, wrong page and invalid JSON; save failures remain
  assert.equal((await post('{')).status,400);assert.equal((await post(lead)).status,200);assert.equal(saved,1);
  failSave=true;assert.equal((await post(lead)).status,503);
 });
+
+test('GHL default root custom fields reach answers without exposing its envelope or key',()=>{
+ const result=normalizeRelay({...lead,answers:undefined,
+  'What would you like to explore?':'a_custom_crm',
+  'What is your main business software today?':'no_system_yet',
+  'What is your role?':'owner',
+  'How many people work in your business, including you?':'2-5',
+  'Services needed':['CRM','Automation'], 'Number of branches':0, 'Needs migration':false,
+  location:{name:'Private location'},workflow:{id:'workflow'},api_key:'do-not-copy',access_token:'do-not-copy'
+ },'meta');
+ assert.equal(result.attribution.answers['What would you like to explore?'],'a_custom_crm');
+ assert.equal(result.attribution.answers['Services needed'],'CRM, Automation');
+ assert.equal(result.attribution.answers['Number of branches'],'0');
+ assert.equal(result.attribution.answers['Needs migration'],'false');
+ for(const key of ['workforge_key','api_key','access_token','location','workflow','email','contact_id'])assert.equal(result.attribution.answers[key],undefined);
+ assert.ok(!JSON.stringify(result).includes('do-not-copy'));
+});
+test('relay supports custom-field containers, explicit JSON answers and unresolved fields',()=>{
+ const result=normalizeRelay({...lead,answers:undefined,interest:'{{contact.interest}}',custom_fields:[{name:'Role',value:'Owner'}],customFields:{Team:5},customData:{answers:'{"interest":"CRM","multi":["A","B"],"workforge_key":"secret"}'}},'meta');
+ assert.deepEqual(result.attribution.answers,{Role:'Owner',Team:'5',interest:'CRM',multi:'A, B'});
+ assert.throws(()=>normalizeRelay({...lead,answers:'{broken'},'meta'));
+ assert.throws(()=>normalizeRelay({...lead,answers:{nested:{unsafe:'object'}}},'meta'));
+ assert.throws(()=>normalizeRelay({...lead,answers:{long:'a'.repeat(2001)}},'meta'));
+ assert.equal(normalizeRelay({...lead,answers:undefined,'What is your role?':'<test lead: dummy data for role>'},'meta').status,'test');
+});

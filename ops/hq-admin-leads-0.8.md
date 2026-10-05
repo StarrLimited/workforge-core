@@ -65,3 +65,27 @@ Official provider references:
 - https://developers.google.com/google-ads/webhook/docs/implementation
 - https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieving/
 - https://help.gohighlevel.com/support/solutions/articles/155000003299-actions-webhook
+
+## Form responses (HQ 0.8.1)
+
+Each HQ inquiry and its Sales & delivery discovery view now has **Form responses**.
+Responses load by account under the existing HQ membership/RLS rules, separate
+from salesperson notes. Each submission retains its source, form, submitted time,
+questions, answers and available campaign/ad names. The standalone CRM demo is
+unaffected. Refresh retrieves the latest saved submission snapshots.
+
+The GHL receiver now captures its standard root-level contact custom fields,
+`custom_fields`/`customFields` objects or arrays, and explicit `answers` objects
+or JSON strings. Arrays, numbers and booleans are accepted. It excludes contact
+routing, workflow/location objects and credential fields. Empty or unresolved
+merge values do not override a populated answer. The existing WorkForge source,
+Page/form allowlists, key verification and provider-test isolation remain in force.
+
+Replaying a received provider ID fills missing answers while preserving populated
+answers, the original timestamp, linked account, notes, ownership, sales stage and
+follow-up date. It does not create another account. Website intake saves every
+submitted question; older receipts retain their existing qualification fields.
+Google native intake already captured all question columns and now displays them.
+
+Verification: typecheck, 80 unit tests, production build and isolated HQ database
+integration tests, including replay enrichment and no-duplicate/no-overwrite checks.

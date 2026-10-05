@@ -41,11 +41,21 @@ export function normalizeSubmission(body) {
   for (const key of ['Lead Source', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'UTM Content', 'UTM Term', 'Landing Page', 'Landing Variant', 'Business Type', 'Main Challenge', 'Team Size']) {
     attribution[key] = field(data, key, key === 'Landing Page' ? 2000 : 500);
   }
+  // Preserve every submitted question, including future custom form fields.
+  // Attribution stays outside the answer list and internal notes stay editable.
+  if (Object.keys(data).length > 100) throw new IntakeError(400);
+  const metadata = new Set(['Lead Source', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'UTM Content', 'UTM Term', 'Landing Page', 'Landing Variant']);
+  attribution.answers = Object.fromEntries(Object.entries(data).filter(([key]) => !metadata.has(key)).map(([key, raw]) => {
+    if (!key || key.length > 200 || key.includes('\0')) throw new IntakeError(400);
+    const values = Array.isArray(raw) ? raw : [raw];
+    if (values.length > 100 || values.some(v => v != null && !['string', 'number', 'boolean'].includes(typeof v))) throw new IntakeError(400);
+    return [key, field({ answer: values.filter(v => v != null).map(String).join(', ') }, 'answer', 20000)];
+  }));
   return {
     site_id: SITE_ID, submission_id: p.id, form_id: p.formId, submitted_at: new Date(p.submittedAt).toISOString(),
     company, contact_name: contact, email, phone, source: source(attribution['Lead Source'], attribution['UTM Source'], attribution['UTM Medium']),
     scope: field(data, 'Workflow Notes', 20000), attribution,
-    notes: [`Website inquiry: ${form}`, `Submitted: ${new Date(p.submittedAt).toISOString()}`, ...Object.entries(attribution).filter(([key, value]) => key !== 'form' && value).map(([key, value]) => `${key}: ${value}`)].join('\n'),
+    notes: [`Website inquiry: ${form}`, `Submitted: ${new Date(p.submittedAt).toISOString()}`, ...Object.entries(attribution).filter(([key, value]) => !['form', 'answers'].includes(key) && value).map(([key, value]) => `${key}: ${value}`)].join('\n'),
   };
 }
 async function readBody(req) {

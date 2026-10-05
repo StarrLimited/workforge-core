@@ -52,6 +52,9 @@ console.log('PASS: Solo pricing, optional Care, mutually exclusive support, requ
 await db.exec(readFileSync(root+'/supabase/migrations/20261003045400_hq_admin_lead_connections.sql','utf8'));
 await db.exec(readFileSync(root+'/tests/hq-admin-integration.sql','utf8'));
 console.log('PASS: HQ user administration, role isolation, invitation activation/revocation, owner protection, deactivation, relay credentials, receipt deduplication and test isolation.');
+await db.exec(readFileSync(root+'/supabase/migrations/20261005023507_hq_form_answers.sql','utf8'));
+await db.exec(readFileSync(root+'/tests/hq-form-answers-integration.sql','utf8'));
+console.log('PASS: Replay enriches missing form answers, preserves existing answers and sales records, rejects wrong identity, and creates no duplicate accounts.');
 } catch(error) {
  console.error(JSON.stringify({message:error.message,code:error.code,detail:error.detail,where:error.where}));process.exitCode=1;
 } finally { await db.close(); }

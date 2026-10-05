@@ -69,6 +69,49 @@ export function normalizeMeta(body, event) {
   return { ...event, status: 'received', submitted_at: submitted(body.created_time), ...contact({ name: fields.full_name || [fields.first_name,fields.last_name].filter(Boolean).join(' '), email: fields.email || fields.work_email, phone: fields.phone_number || fields.work_phone_number, company: fields.company_name }),
     attribution, notes: 'Meta lead form\n' + Object.entries(fields).map(([k,v])=>`${k}: ${v}`).join('\n'), scope: '' };
 }
+// GHL's outbound Webhook places contact custom fields at the root, not in
+// `answers`. Keep question values, never its workflow/location/credential data.
+const RELAY_ENVELOPE = new Set(('contact_id lead_id form_id page_id submitted_at is_test first_name last_name full_name email phone phone_number company_name tags address1 address2 city state country timezone date_created postal_code website date_of_birth contact_source full_address contact_type gclid fbclid campaign_id campaign_name ad_id ad_name adset_id adset_name adgroup_id location workflow user calendar campaign opportunity opportunity_name status lead_value opportunity_source source pipleline_stage pipeline_stage pipeline_id pipeline_name id order invoice task note message contact attributionSource lastAttributionSource customData custom_fields customFields answers form_name').split(' ').map(k=>k.toLowerCase()));
+const privateField = key => /(?:password|secret|token|authorization|cookie|api[ _-]?key|workforge[ _-]?key|^__proto__$|^constructor$|^prototype$)/i.test(key);
+function answerValue(v) {
+  if (v == null) return '';
+  if (Array.isArray(v)) {
+    if (v.length > 100 || v.some(x => x !== null && !['string','number','boolean'].includes(typeof x))) fail('invalid_answers');
+    return value(v.map(x => x == null ? '' : String(x)).filter(Boolean).join(', '), 2000);
+  }
+  if (typeof v === 'boolean' || typeof v === 'number' && Number.isFinite(v)) return String(v);
+  return value(v, 2000);
+}
+export function relayAnswers(body) {
+  const fields = new Map();
+  const add = (key, v) => {
+    if (privateField(key)) return;
+    const name = value(key, 200);
+    const answer = answerValue(v);
+    // Empty/unresolved merge fields must not erase a real answer from another source.
+    if (name && answer && !/^\{\{.*\}\}$/.test(answer)) fields.set(name, answer);
+    if (fields.size > 100) fail('invalid_answers');
+  };
+  for (const [key, v] of Object.entries(body)) {
+    if (!RELAY_ENVELOPE.has(key.toLowerCase()) && !privateField(key) && (v == null || typeof v !== 'object' || Array.isArray(v))) add(key, v);
+  }
+  for (const raw of [body.custom_fields, body.customFields, body.answers]) {
+    if (raw == null || raw === '') continue;
+    let fields = raw;
+    if (typeof fields === 'string') { try { fields = JSON.parse(fields); } catch { fail('invalid_answers'); } }
+    if (Array.isArray(fields)) {
+      if (fields.length > 100) fail('invalid_answers');
+      for (const f of fields) {
+        if (!f || typeof f !== 'object') fail('invalid_answers');
+        add(f.name || f.key || f.id, f.value ?? f.field_value);
+      }
+    } else if (fields && typeof fields === 'object') {
+      if (Object.keys(fields).length > 100) fail('invalid_answers');
+      for (const [key, v] of Object.entries(fields)) add(key, v);
+    } else fail('invalid_answers');
+  }
+  return Object.fromEntries(fields);
+}
 export function normalizeRelay(body, provider) {
   const custom=body.customData ?? {};
   if(!custom || typeof custom!=='object' || Array.isArray(custom)) fail('invalid_custom_data');
@@ -80,11 +123,10 @@ export function normalizeRelay(body, provider) {
   const base={external_id,form_id,page_id,submitted_at:submitted(b.submitted_at)};
   if(b.is_test!=null && ![true,false,'true','false'].includes(b.is_test)) fail('invalid_test_flag');
   if(b.is_test===true || b.is_test==='true') return {...base,status:'test'};
-  const answers=b.answers??{};
-  if(!answers || typeof answers!=='object' || Array.isArray(answers) || Object.keys(answers).length>100) fail('invalid_answers');
-  const fields=Object.fromEntries(Object.entries(answers).map(([k,v])=>[value(k,100),value(v,2000)]));
+  const fields=relayAnswers(b);
+  if(Object.values(fields).some(v=>v.startsWith('<test lead: dummy data'))) return {...base,status:'test'};
   const attribution={transport:'ghl',answers:fields};
-  for(const k of ['campaign_id','campaign_name','ad_id','ad_name','gclid','fbclid']) if(b[k]) attribution[k]=value(b[k],1000);
+  for(const k of ['form_name','campaign_id','campaign_name','ad_id','ad_name','gclid','fbclid']) if(b[k]) attribution[k]=value(b[k],1000);
   if(JSON.stringify(attribution).length>14000) fail('answers_too_large');
   return {...base,status:'received',...contact({name:b.full_name || [b.first_name,b.last_name].filter(Boolean).join(' '),email:b.email,phone:b.phone || b.phone_number,company:b.company_name}),attribution,notes:`${provider==='meta'?'Meta':'Google Ads'} inquiry via GoHighLevel\n`+Object.entries(fields).map(([k,v])=>`${k}: ${v}`).join('\n'),scope:''};
 }

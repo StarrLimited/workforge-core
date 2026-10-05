@@ -10,3 +10,16 @@
 .hq-sales-entry{display:flex;align-items:center;gap:10px;padding:13px 12px;color:#c7cfd4;text-decoration:none;font-size:.875rem;border-radius:7px}.hq-sales-entry:hover{background:#ffffff0c}
 
 .hq-admin-main{width:min(1180px,100%);margin:0 auto;padding:36px 28px}.hq-admin-row{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 26px;border-bottom:1px solid #e7ecef}.hq-admin-row>div{min-width:0;overflow-wrap:anywhere}.hq-admin-row small{display:block;color:#677984;margin-top:7px}.hq-admin-row fieldset{display:flex;align-items:flex-end;gap:12px;border:0;padding:0;margin:0}.hq-admin-row label{font-size:.8rem}.hq-relay-setup{margin-top:22px;padding-top:22px;border-top:1px solid #e7ecef}.hq-relay-setup summary{cursor:pointer;font-weight:600}.hq-relay-setup code{overflow-wrap:anywhere}.hq-relay-setup pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8rem;background:#f2f5f7;padding:14px;border-radius:6px}.hq-relay-fields{margin:16px 0;display:grid;gap:12px}.hq-relay-fields label{font-size:.875rem}.hq-relay-status{font-size:.875rem;margin:12px 0;color:#536673}.hq-relay-fields fieldset{min-width:0}.hq-admin-main .hq-form fieldset{border:0;padding:0}@media(max-width:780px){.hq-admin-row,.hq-admin-row fieldset{align-items:stretch;flex-direction:column}.hq-admin-row fieldset{width:100%}.hq-admin-main{padding:24px 16px}}
+
+/* Submitted answers stay separate from editable internal notes. */
+.hq-form-responses{margin:20px 0;min-width:0}
+.hq-form-response{margin-top:12px;border:1px solid #dce4df;border-radius:12px;background:#fbfdfb;overflow:hidden}
+.hq-form-response>header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:16px 18px;background:#f0f5f1;border-bottom:1px solid #dce4df}
+.hq-form-response time{font-size:12px;color:#596a60}
+.hq-form-response dl{margin:0;padding:0 18px}
+.hq-form-response dl>div{padding:13px 0;border-bottom:1px solid #e4ebe6}
+.hq-form-response dl>div:last-child{border-bottom:0}
+.hq-form-response dt{font-size:12px;color:#596a60;margin-bottom:5px}
+.hq-form-response dd{margin:0;font-size:15px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;color:#172c20}
+.hq-form-response>footer{display:flex;flex-direction:column;gap:5px;padding:12px 18px;border-top:1px solid #e4ebe6;font-size:12px;color:#596a60;overflow-wrap:anywhere}
+.hq-form-response>p{padding:4px 18px}

@@ -36,3 +36,14 @@ test('Webhook authenticates with a hash and propagates only successful persisten
   const tooLarge = new Request(`https://example.invalid/intake?key=${key}`, { method: 'POST', body: 'a'.repeat(65537) });
   assert.equal((await handler(tooLarge)).status, 413);
 });
+
+test('website preserves custom answers and long workflow notes in a separate snapshot',()=>{
+ const body=payload();body.payload.data['Workflow Notes']='x'.repeat(20000);
+ body.payload.data['Requested services']=['CRM','Automation'];body.payload.data['Employees']=0;body.payload.data['Migrate data']=false;
+ const result=normalizeSubmission(body);
+ assert.equal(result.attribution.answers['Workflow Notes'].length,20000);
+ assert.equal(result.attribution.answers['Requested services'],'CRM, Automation');
+ assert.equal(result.attribution.answers['Employees'],'0');assert.equal(result.attribution.answers['Migrate data'],'false');
+ assert.equal(result.attribution.answers['UTM Campaign'],undefined);
+ assert.ok(!result.notes.includes('[object Object]'));
+});
