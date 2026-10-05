@@ -9,3 +9,158 @@
 /* Override inherited Field OS form widths and button layout within the CRM shell. */
 .crm-toolbar>select,.crm-section-tools select{width:auto;min-width:145px;flex:0 0 auto}.crm-activity-title{display:block}.crm-search{height:42px}.crm-sidebar .crm-workspace select{min-width:0}.crm-section-tools select{max-width:260px}.crm-btn:focus-visible,.crm-icon:focus-visible,.crm-complete:focus-visible{outline:2px solid #c06829;outline-offset:3px}
 @media(max-width:520px){.crm-toolbar>select{flex:1;min-width:0}.crm-section-tools select{max-width:100%}}
+/* Sales workflow */
+.crm-pipeline-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:24px 0}
+.crm-pipeline-metrics>div,.crm-pipeline-metrics>button{display:flex;gap:13px;align-items:flex-start;border:1px solid #e1e5e4;border-radius:10px;padding:18px;text-align:left;background:#fff;color:#353e42}
+.crm-pipeline-metrics>button:hover{border-color:#ef9d65;background:#fffaf5}
+.crm-pipeline-metrics svg{color:#bb652b;flex-shrink:0;margin-top:3px}
+.crm-pipeline-metrics span{display:block;font-size:12px;color:#657078;flex:1}
+.crm-pipeline-metrics strong{display:block;color:#222d33;font-size:25px;line-height:1.35;margin:5px 0}
+.crm-pipeline-metrics small{font-size:11px;color:#68757d}
+.crm-stage-map{display:flex;border:1px solid #dfe3e1;background:#fff;border-radius:10px;overflow:hidden;margin:18px 0 12px}
+.crm-stage-map>button{flex:1;min-width:0;background:#fff;border:0;border-right:1px solid #e5e8e7;padding:14px 10px;text-align:left;position:relative}
+.crm-stage-map>button:hover,.crm-stage-map>button.active{background:#fff3e8}
+.crm-stage-map>button.active{box-shadow:inset 0 -3px #ed7628}
+.crm-stage-map>button>span{display:inline-grid;place-items:center;border-radius:50%;width:22px;height:22px;background:#f2e9e1;color:#975018;font-size:11px;font-weight:700;margin-bottom:6px}
+.crm-stage-map strong{display:block;font-size:12px;line-height:1.4}
+.crm-stage-map small{display:block;margin-top:4px;font-size:10px;color:#717a7e}
+.crm-stage-outcomes{padding:15px 13px;display:flex;flex-direction:column;justify-content:center;gap:10px;font-size:11px}
+.crm-stage-outcomes span{display:flex;align-items:center;gap:6px;color:#63726c}
+.crm-stage-outcomes span:first-child{color:#238260}
+.crm-stage-guide{background:#fff9f3;border:1px solid #f0ddcb;border-radius:9px;padding:20px;display:grid;grid-template-columns:1.2fr 1fr;gap:12px 24px;margin-bottom:16px}
+.crm-stage-guide h3{font-size:18px;margin:5px 0}
+.crm-stage-guide p{font-size:13px;color:#62686b;margin:0}
+.crm-stage-guide ul{font-size:12px;margin:0;padding-left:20px;line-height:1.9}
+.crm-stage-guide>small{grid-column:1/-1;color:#8b643f;font-size:11px}
+.crm-board-help{font-size:12px;color:#6c767a;margin:10px 0 20px}
+.crm-attention-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0}
+.crm-attention-filters button{background:transparent;border:1px solid #dce1de;border-radius:6px;color:#657169;padding:7px 10px;font-size:12px;display:flex;gap:7px;align-items:center}
+.crm-attention-filters button.active{color:#a44b14;border-color:#efb38a;background:#fff4e9}
+.crm-attention-filters button span{background:#e9eeea;border-radius:4px;padding:0 5px;font-size:10px;color:#545e57}
+.crm-attention-filters>small{margin-left:auto;color:#748079;font-size:11px}
+.crm-board{align-items:stretch;gap:13px;padding-bottom:22px}
+.crm-column{flex:0 0 242px;min-width:242px;background:#ecf0ed;border-radius:9px;min-height:380px}
+.crm-column>header{min-height:133px}
+.crm-column>header h2{font-size:14px}
+.crm-stage-number{display:grid;place-items:center;background:#dae1db;color:#566b5b;border-radius:5px;width:21px;height:21px;font-size:10px;flex-shrink:0}
+.crm-column-purpose{font-size:11px!important;line-height:1.55!important;color:#748078!important;margin-top:9px!important;display:block!important;min-height:50px}
+.crm-deal-card{border:1px solid #dfe5df;box-shadow:0 1px 2px #18322806;padding:14px;text-align:left}
+.crm-deal-card:hover{border-color:#e3a16c;box-shadow:0 4px 12px #243b2010}
+.crm-deal-card.is-priority{border-left:3px solid #ec782d}
+.crm-deal-card>strong{font-size:14px;line-height:1.4}
+.crm-deal-card>small{display:block;font-size:10px;color:#7a837c;margin-top:7px}
+.crm-card-source>.crm-priority{width:auto!important;border-radius:0!important;background:none!important;font-size:10px!important;color:#b76227!important;display:flex!important;gap:3px;align-items:center}
+.crm-card-meta{display:flex;justify-content:space-between;gap:5px;font-size:10px;color:#7d877f;margin-top:7px}
+.crm-next{font-size:11px;line-height:1.4;white-space:normal!important}
+.crm-next svg{flex-shrink:0}
+.crm-add-in-stage{border:0;background:transparent;padding:12px 15px;display:flex;align-items:center;gap:6px;font-size:12px;color:#64735f;width:100%}
+.crm-column.is-won{background:#e8f1eb}
+.crm-column.is-lost{background:#f0ecea}
+.crm-column.is-won>header,.crm-column.is-lost>header{min-height:105px}
+.crm-modal.crm-modal-wide{width:min(1120px,calc(100vw - 36px));max-width:1120px}
+.crm-opportunity{padding:24px;font-size:14px;line-height:1.5;color:#283235}
+.crm-opportunity-head{display:flex;justify-content:space-between;gap:20px;margin-bottom:20px}
+.crm-opportunity-head h2{margin:10px 0 5px;font-size:25px;line-height:1.25}
+.crm-opportunity-head p{margin:0;color:#6e7a7b}
+.crm-opportunity-head>div:last-child{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.crm-opportunity-head>div>strong{font-size:26px}
+.crm-outcome{text-transform:uppercase;letter-spacing:1px;padding:4px 8px;background:#edf1ed;border-radius:4px;font-size:10px;color:#586b5a;font-weight:600}
+.crm-outcome.won{background:#e1f3e9;color:#208258}
+.crm-outcome.lost{background:#f8eae5;color:#b6634c}
+.crm-opportunity .crm-detail-facts{grid-template-columns:repeat(4,1fr);margin:18px 0}
+.crm-opportunity .crm-detail-facts strong{text-transform:none}
+.crm-workspace-tabs{border-bottom:1px solid #e1e5df;padding-bottom:12px;margin:22px 0}
+.crm-workspace-tabs button{padding:9px 13px;font-size:13px}
+.crm-opportunity-grid{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:25px}
+.crm-playbook{background:#fbfaf5;border:1px solid #e9e4d8;padding:22px;border-radius:9px}
+.crm-playbook h3{font-size:21px;margin:7px 0}
+.crm-playbook p{font-size:13px;color:#747c72;margin:0 0 20px}
+.crm-playbook-progress{display:flex;justify-content:space-between;gap:10px;font-size:11px;margin-bottom:12px;color:#7b836f}
+.crm-playbook-check{display:flex!important;align-items:center;gap:10px;border-top:1px solid #e8e6df;padding:13px 0;font-size:13px}
+.crm-playbook-check input{width:17px!important;height:17px!important;flex:0 0 17px;accent-color:#ed7828}
+.crm-playbook .crm-btn{margin-top:15px}
+.crm-playbook>.crm-help{display:block;margin:13px 0 0;font-size:11px}
+.crm-next-panel{background:#f4f7f4;border:1px solid #e2e9e2;border-radius:9px;padding:20px;height:fit-content}
+.crm-next-panel h3{font-size:18px;line-height:1.4;margin:9px 0}
+.crm-next-panel h4{font-size:13px;margin:0}
+.crm-next-panel p{font-size:12px;color:#737d74;margin:9px 0 14px}
+.crm-next-panel>.crm-btn{width:100%;justify-content:center;margin:4px 0;font-size:12px}
+.crm-next-panel hr{border:0;border-top:1px solid #dfe6df;margin:22px 0}
+.crm-next-panel .crm-help{display:block;font-size:10px;margin-top:12px}
+.crm-form-intro{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin:20px 0}
+.crm-form-intro h3{margin:0;font-size:20px}
+.crm-form-intro p{font-size:13px;color:#7a827e;margin:6px 0 0}
+.crm-opportunity fieldset{border:0;padding:0;margin:0;min-width:0}
+.crm-opportunity .crm-form-grid{padding:0}
+.crm-opportunity form>footer{display:flex;justify-content:flex-end;gap:10px;padding:20px 0 0;border-top:0}
+.crm-timeline{padding:20px 0}
+.crm-timeline article{display:flex;gap:14px;padding:0 0 24px;position:relative;margin-left:6px}
+.crm-timeline article:before{content:'';width:1px;position:absolute;left:4px;top:10px;bottom:0;background:#e2e6e1}
+.crm-timeline article:last-child:before{display:none}
+.crm-timeline-dot{width:9px;height:9px;background:#d68d4b;border:2px solid #f4e3d3;border-radius:50%;margin-top:6px;flex-shrink:0}
+.crm-timeline strong{font-size:13px}
+.crm-timeline p{white-space:pre-wrap;font-size:13px;color:#606d62;margin:6px 0}
+.crm-timeline small{font-size:11px;color:#879085}
+.crm-inline-date{font-size:11px;color:#677469;display:flex;align-items:center;gap:8px}
+.crm-inline-date input{width:auto;padding:8px;background:#fff;border:1px solid #dfe5df;border-radius:6px}
+.crm-report-stalled{margin-top:22px}
+.crm-calendar{margin-bottom:24px}
+.crm-week-grid{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));overflow-x:auto}
+.crm-week-grid>section{min-height:270px;border-right:1px solid #e4e8e2;padding:12px 8px}
+.crm-week-grid>section:last-child{border-right:0}
+.crm-week-grid h3{font-size:12px;color:#6b796c;margin:4px 0 16px;text-align:center}
+.crm-week-grid .is-today{background:#fffaf1}
+.crm-week-grid .is-today h3{color:#c46a29}
+.crm-week-grid button{display:block;text-align:left;width:100%;padding:10px 8px;margin:0 0 8px;border:1px solid #e3e8df;border-left:3px solid #df8c45;border-radius:5px;background:#f5f8f2;color:#3c4c3e}
+.crm-week-grid button strong{font-size:11px;display:block;line-height:1.5}
+.crm-week-grid button small{font-size:9px;display:block;color:#718271;margin-bottom:4px}
+.crm-week-grid button.is-complete{opacity:.55;border-left-color:#729270}
+.crm-calendar-empty{font-size:10px;color:#98a192;display:block;text-align:center}
+.crm-calendar>header{flex-wrap:wrap;gap:12px}
+.crm-modal .crm-field>strong{font-size:20px;padding-top:6px}
+.crm-modal .crm-field>small{font-size:11px;color:#7b837c}
+.crm-modal-wide .crm-activity-row{padding:12px 0}
+.crm-modal-wide .crm-activity-title strong{font-size:12px}
+.crm-modal-wide .crm-activity-title span{font-size:10px}
+.crm-modal-wide .crm-activity-date{font-size:10px}
+.crm-modal .crm-form-grid h3{margin:10px 0 0;font-size:15px}
+.crm-modal .crm-check input{width:auto;flex:none}
+.crm-stage-map button:focus-visible,.crm-deal-card:focus-visible{outline:3px solid #e89950;outline-offset:2px}
+
+@media(min-width:1600px){.crm-column{flex:1;min-width:210px}
+.crm-pipeline-metrics strong{font-size:28px}
+}
+
+@media(max-width:1100px){.crm-pipeline-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+.crm-stage-map{flex-wrap:wrap}
+.crm-stage-map>button{flex:1 0 28%;border-bottom:1px solid #e5e8e7}
+.crm-stage-outcomes{flex:1 0 100%;flex-direction:row;padding:8px}
+.crm-opportunity-grid{grid-template-columns:minmax(0,1fr) 250px}
+.crm-calendar .crm-actions{flex-wrap:wrap}
+}
+
+@media(max-width:750px){.crm-modal.crm-modal-wide{width:calc(100vw - 16px)}
+.crm-opportunity{padding:16px}
+.crm-opportunity-grid{grid-template-columns:1fr}
+.crm-opportunity-head h2{font-size:20px}
+.crm-opportunity-head>div>strong{font-size:21px}
+.crm-opportunity .crm-detail-facts{grid-template-columns:repeat(2,1fr)}
+.crm-workspace-tabs{flex-wrap:wrap}
+.crm-workspace-tabs button{font-size:12px}
+.crm-stage-guide{grid-template-columns:1fr}
+.crm-stage-guide>small{grid-column:auto}
+.crm-pipeline-metrics{gap:9px}
+.crm-pipeline-metrics>div,.crm-pipeline-metrics>button{padding:12px;gap:8px}
+.crm-pipeline-metrics strong{font-size:21px}
+.crm-pipeline-metrics svg{width:15px}
+.crm-stage-map strong{font-size:11px}
+.crm-attention-filters button{font-size:11px}
+.crm-form-intro{flex-wrap:wrap}
+.crm-inline-date{flex-direction:column;align-items:flex-start}
+.crm-opportunity .crm-deal-controls{flex-wrap:wrap}
+.crm-next-panel{order:-1}
+.crm-next-panel hr,.crm-next-panel h4,.crm-next-panel h4+p,.crm-next-panel>.crm-link{display:none}
+}
+
+
+.crm-stage-order{display:flex;gap:2px}.crm-pipeline-settings>div{flex-wrap:wrap}
