@@ -19,7 +19,7 @@ export function EditForm({edit,d,save,onClose,busy,error}:{edit:Edit;d:CRMData;s
  const [newContact,setNewContact]=useState(false);
  const [csv,setCSV]=useState('');const [preview,setPreview]=useState('');
  const [selectedDeal,setSelectedDeal]=useState(edit.kind==='activity'?edit.item?.deal_id||edit.dealId||'':'');
- const title=edit.kind==='import'?'Import contacts':edit.kind==='member'?'Add team access':`${item?'Edit':'New'} ${edit.kind}`;
+ const title=edit.kind==='import'?'Import contacts':edit.kind==='member'?'Add team access':`${item?'Edit':'New'} ${edit.kind==='deal'?'opportunity':edit.kind}`;
  function submit(e:FormEvent<HTMLFormElement>){const f=inputData(e);let payload:Record<string,unknown>={...f,id:item?.id};
   if(edit.kind==='contact')payload={...payload,tags:String(f.tags||'').split(',').map(s=>s.trim()).filter(Boolean),do_not_contact:f.do_not_contact==='on'};
   if(edit.kind==='deal')payload={...payload,version:edit.item?.updated_at,...(!edit.item?{contact_id:newContact?'':f.contact_id,next_at:new Date(String(f.next_at)).toISOString()}:{} )};

@@ -164,3 +164,13 @@
 
 
 .crm-stage-order{display:flex;gap:2px}.crm-pipeline-settings>div{flex-wrap:wrap}
+
+.crm-stage-map>button{display:grid;grid-template-columns:22px minmax(0,1fr);gap:3px 8px;align-items:center}
+.crm-stage-map>button>span{grid-row:1/3;margin:0}
+.crm-stage-map>button>strong{font-size:12px;line-height:1.3}
+.crm-stage-map>button>small{grid-column:2;margin:0}
+.crm-content:has(.crm-pipeline-metrics){padding-top:27px}
+.crm-content:has(.crm-pipeline-metrics) .crm-heading{margin-bottom:22px}
+.crm-pipeline-metrics{margin:17px 0}.crm-pipeline-metrics>div,.crm-pipeline-metrics>button{padding:15px}
+
+.crm-report-range{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
