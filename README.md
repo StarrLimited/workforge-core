@@ -102,3 +102,30 @@ Apply `20261005192615_crm_sales_workflow.sql` before deploying this revision. Pi
 The opportunity workspace includes a stage checklist, qualification (need, budget, decision maker, timing), proposal scope/link/status/dates, chronological activity and notes, and next-step scheduling. Creating a new opportunity optionally creates its contact and always schedules its first activity in one transaction. Logging a touchpoint records an outcome, optionally completes a selected activity, schedules the next action, and can move initial outreach to Contacted atomically. Concurrency checks reject stale deal changes. Follow-up automation respects all existing open activities.
 
 The board has owner/source/search filters plus overdue, missing-action, stalled, and priority queues. Won and Lost are visible outcomes. Activities include a weekly calendar with workspace-timezone grouping. Reports filter closed outcomes by date and show current pipeline distribution separately; the distribution is not presented as historical funnel conversion. Proposal export downloads a text summary and does not send messages or collect signatures.
+
+## Square invoice payments
+
+Open **Square payments** from Billing (FRX) or the HQ sidebar (WorkForge). This integration uses Square API version 2026-09-16.
+
+- Project invoices support an optional fixed-dollar or percentage deposit and a final balance, with separate due dates. Saving creates a draft; **Review & send** publishes it and Square emails the customer.
+- Monthly services use Square Subscriptions with a monthly cadence and a chosen start date. By default Square emails each month's invoice. A previously saved customer card can be selected for automatic collection after recording explicit recurring-payment authorization.
+- Payment status is updated from signed Square callbacks and can also be refreshed manually. Repeated requests reuse durable operation IDs; delayed invoice events cannot overwrite newer versions.
+- Cancellation stops subscription renewal at Square's effective cancellation date. Previously issued invoices remain due. Canceling an invoice does not refund money; handle refunds in Square and refresh the status.
+- Card numbers never pass through or get stored in these apps.
+
+### Setup and release
+
+1. Apply the included `square_billing` Supabase migration to this app's database. All payment tables are server-only and inaccessible to browser API keys.
+2. Set the server variables documented in `.env.square.example` in Vercel. Start with Square Sandbox credentials. Use the same environment for the token, location, and webhook signature. WorkForge requires its own Supabase server secret key in addition to its existing publishable key.
+3. Register `https://<app-host>/api/square/webhook` in the Square Developer Console. Copy that exact URL to `SQUARE_WEBHOOK_URL`, and set the endpoint's signature key. Subscribe to invoice created/updated/published/payment-made/scheduled-charge-failed/refunded/canceled events and subscription created/updated events.
+4. Each app has independent account settings and payment history. The same Square merchant can be used in both, or each can use a separate account. Never copy production Square credentials into Preview: the integration rejects that combination.
+5. Redeploy after setting server variables, then use **Check connection**. Test a draft, deposit, remaining payment, monthly invoice, authorized saved-card subscription, failed payment, refund, cancellation, and duplicate callback in Sandbox.
+6. Switch the app to its intended production Square account only after the Sandbox checks pass. No existing customer is enrolled or charged automatically by deployment.
+
+FRX sources payable amounts from posted, authorized Xero sales invoices linked to a CRM customer. Xero remains the accounting source of truth: reconcile Square receipts in Xero before relying on Xero balances and reports. WorkForge sources one-time fees from agreed engagements and monthly plans from subscriptions; its manually maintained commercial totals are not automatically overwritten. The Square screen keeps verified collections separately. Do not collect the same balance through both Square and another channel without first updating/canceling the Square invoice.
+
+Amounts include any applicable tax already present in the source. New monthly service amounts are tax-inclusive. The integration currently collects USD card payments.
+
+### Verification
+
+Run `npm test`, `npm run typecheck`, and `npm run build`. Square-specific tests exercise money/date boundaries, signed callbacks, partial deposits, retry stability, unsafe payment links, API errors, and environment isolation. End-to-end Sandbox payment verification requires account credentials; no live charges are part of automated tests.
