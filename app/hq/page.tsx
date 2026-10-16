@@ -9,9 +9,10 @@ import './hq.css';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'WorkForge HQ | Internal operations', robots: { index: false, follow: false } };
 
-export default async function HQPage() {
+export default async function HQPage({ searchParams }: { searchParams: Promise<{ section?: string; record?: string }> }) {
+  const params = await searchParams;
   const workspaces = await loadWorkspaces();
   if (!workspaces.some(w => w.id === HQ_WORKSPACE_ID)) return <main className="login-card"><BrandLogo plate/><h1>WorkForge HQ</h1><p>This workspace is available to the WorkForge team. Your account does not currently have access.</p><a href="/">Return to your workspaces</a></main>;
   const productWorkspace = workspaces.find(w => w.model === 'field');
-  return <HQWorkbench data={await loadHQ()} productWorkspaceId={productWorkspace?.id} />;
+  return <HQWorkbench data={await loadHQ()} productWorkspaceId={productWorkspace?.id} initialCalendar={params.section === "calendar"} initialEventId={params.record} />;
 }

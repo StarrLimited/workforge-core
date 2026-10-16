@@ -23,18 +23,18 @@ const NAV = [
 const money = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(cents / 100);
 const todayInDenver = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Denver', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 
-export default function HQWorkbench({ data: d, productWorkspaceId }: { data: HQData; productWorkspaceId?: string }) {
+export default function HQWorkbench({ data: d, productWorkspaceId, initialCalendar, initialEventId }: { data: HQData; productWorkspaceId?: string; initialCalendar?: boolean; initialEventId?: string }) {
   const router = useRouter();
-  const [view, setView] = useState<View>('overview');
+  const [view, setView] = useState<View>(initialCalendar ? 'calendar' : 'overview');
   const [mobile, setMobile] = useState(false);
   const [search, setSearch] = useState('');
-  const [form, setForm] = useState<HQForm | null>(null);
+  const [form, setForm] = useState<HQForm | null>(() => { const record = d.events.find(e => e.id === initialEventId); return record && canWrite(d.role) ? { kind: 'event', record } : null; });
   const [accountId, setAccountId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [taskFilter, setTaskFilter] = useState('open');
-  const [month, setMonth] = useState(() => todayInDenver().slice(0, 7));
+  const [month, setMonth] = useState(() => { const event = d.events.find(e => e.id === initialEventId); return event ? new Intl.DateTimeFormat('en-CA', {timeZone:'America/Denver',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(event.starts_at)).slice(0,7) : todayInDenver().slice(0,7); });
   const today = todayInDenver();
   const writable = canWrite(d.role);
   const metrics = hqMetrics(d, today);
