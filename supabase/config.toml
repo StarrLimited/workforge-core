@@ -12,3 +12,8 @@ entrypoint = "./functions/hq-ad-intake/index.ts"
 
 [functions.hq-gmail]
 verify_jwt = false
+
+[functions.portfolio-calendar]
+# Verifies the caller's Starr Auth token and active company access inside the function.
+verify_jwt = false
+entrypoint = "./functions/portfolio-calendar/index.ts"
